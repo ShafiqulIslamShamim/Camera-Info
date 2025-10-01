@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+    android:shortcutId="open_main"
+    android:enabled="true"
+    android:icon="@mipmap/home_shortcut"
+    android:shortcutShortLabel="@string/shortcut_main_short"
+    android:shortcutLongLabel="@string/shortcut_main_long"
+  >
+        <intent
+      android:action="android.intent.action.VIEW"
+      android:targetPackage="com.shamim.camerainfo"
+      android:targetClass="com.shamim.camerainfo.TabbedActivity"
+    />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+    android:shortcutId="open_settings"
+    android:enabled="true"
+    android:icon="@mipmap/settings_shortcut"
+    android:shortcutShortLabel="@string/shortcut_settings_short"
+    android:shortcutLongLabel="@string/shortcut_settings_long"
+  >
+        <intent
+      android:action="android.intent.action.VIEW"
+      android:targetPackage="com.shamim.camerainfo"
+      android:targetClass="com.shamim.camerainfo.SettingsActivity"
+    />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>
