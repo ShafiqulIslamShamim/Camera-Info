@@ -7,20 +7,16 @@ import android.content.res.Configuration;
 import android.graphics.*;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
-import androidx.activity.EdgeToEdge;
-
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -136,8 +132,8 @@ public class SettingsActivity extends AppCompatActivity {
         break;
     }
 
-        // Enable edge-to-edge (backward compatible)
-        EdgeToEdge.enable(this);
+    // Enable edge-to-edge (backward compatible)
+    EdgeToEdge.enable(this);
   }
 
   @Override

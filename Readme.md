@@ -43,7 +43,23 @@ A lightweight and powerful Android application that provides in-depth details ab
 ## 🐞 Bug Fixes  
 
 - Fixed truncation of certain resolution values in the report view.  
-- Resolved long load times when selecting **Camcorder Profile Info**.  
+- Resolved long load times when selecting **Camcorder Profile Info**.
+
+---
+
+## 🖼️ Screenshots
+
+| Basic Camera Info | Camcorder Info |
+|--------------------------|------------------|
+| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/basic_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/camcoder_info.jpg) |
+
+| All Camera Info | All Camera Details |
+|-------------|----------------|
+| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/all_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/all_info_details.jpg) |
+
+| Settings Activity | About Info Activity |
+|--------------------------|------------------------|
+| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/settings.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/about_info.jpg) |
 
 ---
 
@@ -78,4 +94,4 @@ Let’s make **Camera Info** even more powerful together.
 
 ## 📦 Download
 
-📥 **[Download the latest release here](https://github.com/ShafiqulIslamShamim/Camera-Info/releases/tag/v1.0)**  
+📥 **[Download the latest release here](https://github.com/ShafiqulIslamShamim/Camera-Info/releases/tag/v1.2)**  
