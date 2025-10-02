@@ -36,7 +36,7 @@ public class AboutInfoPreference extends Preference {
                 .startActivity(
                     IntentUtils.openUrl(
                         getContext(),
-                        "https://github.com/ShafiqulIslamShamim/Camera-Info/PrivacyPolicy.txt"));
+                        "https://github.com/ShafiqulIslamShamim/Camera-Info/blob/main/PrivacyPolicy.txt"));
           });
     }
 
