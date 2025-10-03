@@ -108,7 +108,7 @@
     style="@style/Widget.Material3.CircularProgressIndicator"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:indicatorSize="26dp"
+    app:indicatorSize="40dp"
     app:trackThickness="4dp"
     app:indeterminateAnimationType="contiguous"
     android:visibility="gone"

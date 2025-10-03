@@ -398,12 +398,29 @@ public class Camera2ApiKeysInfo {
     try {
       Integer hwLevel = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
       if (hwLevel != null) {
-        sb.append("SupportedHardwareLevel = ").append(hwLevel).append("\n");
+        sb.append("SupportedHardwareLevel = ").append(getHardwareLevelName(hwLevel)).append("\n");
       }
     } catch (Exception ignored) {
     }
 
     return sb.toString();
+  }
+
+  public static String getHardwareLevelName(int i) {
+    switch (i) {
+      case 0:
+        return "";
+      case 1:
+        return "1 (full)";
+      case 2:
+        return "2 (legacy)";
+      case 3:
+        return "3";
+      case 4:
+        return "4 (external)";
+      default:
+        return "Null (limited)";
+    }
   }
 
   public static boolean isLogicalCameraId(CameraCharacteristics currentCameraCharacteristics) {

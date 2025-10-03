@@ -189,6 +189,16 @@ public class MainActivity extends AppCompatActivity {
           }
           combinedInfo.append(cameraInformation);
 
+          int keyColor = getColorFromAttr(this, com.google.android.material.R.attr.colorPrimary);
+          int separatorColor =
+              getColorFromAttr(this, com.google.android.material.R.attr.colorTertiary);
+          int valueColor =
+              getColorFromAttr(this, com.google.android.material.R.attr.colorSecondary);
+
+          android.text.SpannableStringBuilder spannableText =
+              ColoredTextHelper.setColoredText(
+                  combinedInfo.toString(), keyColor, separatorColor, valueColor);
+
           // Switch back to UI thread
           runOnUiThread(
               () -> {
@@ -199,15 +209,7 @@ public class MainActivity extends AppCompatActivity {
                     () -> {
                       progressIndicator.setVisibility(View.GONE);
 
-                      int keyColor =
-                          getColorFromAttr(this, com.google.android.material.R.attr.colorPrimary);
-                      int separatorColor =
-                          getColorFromAttr(this, com.google.android.material.R.attr.colorTertiary);
-                      int valueColor =
-                          getColorFromAttr(this, com.google.android.material.R.attr.colorSecondary);
-
-                      ColoredTextHelper.setColoredText(
-                          textView, combinedInfo.toString(), keyColor, separatorColor, valueColor);
+                      textView.setText(spannableText);
                     };
 
                 if (remaining > 0) {

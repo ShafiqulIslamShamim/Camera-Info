@@ -3,12 +3,11 @@ package com.shamim.camerainfo;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.widget.TextView;
 
 public class ColoredTextHelper {
 
-  public static void setColoredText(
-      TextView textView, String fullText, int keyColor, int separatorColor, int valueColor) {
+  public static SpannableStringBuilder setColoredText(
+      String fullText, int keyColor, int separatorColor, int valueColor) {
     SpannableStringBuilder spannable = new SpannableStringBuilder();
 
     // Split with limit to preserve trailing newlines
@@ -74,7 +73,6 @@ public class ColoredTextHelper {
         spannable.append("\n");
       }
     }
-
-    textView.setText(spannable);
+    return spannable;
   }
 }

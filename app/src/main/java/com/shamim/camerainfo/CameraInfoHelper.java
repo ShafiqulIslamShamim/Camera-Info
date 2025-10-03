@@ -27,6 +27,10 @@ public class CameraInfoHelper {
   }
 
   public static String getAllCameraInfo(CameraManager cm) {
+
+    // extra info
+    int logmode = SharedPrefValues.getValue("pref_log_mode", 0);
+
     StringBuilder sb = new StringBuilder();
 
     try {
@@ -88,23 +92,25 @@ public class CameraInfoHelper {
           SizeF sensorSize = c.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
           if (focalLengths != null && focalLengths.length > 0 && sensorSize != null) {
             float focal = focalLengths[0];
-            sb.append("FocalLength = ").append(String.format("%.2fmm", focal)).append("\n");
+
+            if (logmode != 1) {
+              sb.append("FocalLength = ").append(String.format("%.2fmm", focal)).append("\n");
+            }
 
             float focalEq = Camera2ApiKeysInfo.calculate35mmeqv(focal, sensorSize);
             sb.append("35mm eqv FocalLength = ")
                 .append(String.format("%.2fmm", focalEq))
                 .append("\n");
           } else {
-            sb.append("FocalLength = ?\n");
+            if (logmode != 1) {
+              sb.append("FocalLength = ?\n");
+            }
             sb.append("35mm eqv FocalLength = ?\n");
           }
         } catch (Exception ignored) {
           sb.append("FocalLength = ?\n");
           sb.append("35mm eqv FocalLength = ?\n");
         }
-
-        // extra info
-        int logmode = SharedPrefValues.getValue("pref_log_mode", 0);
 
         if (logmode == 0) {
           sb.append(Camera2ApiKeysInfo.buildExtraDetails(c));
@@ -115,7 +121,7 @@ public class CameraInfoHelper {
           sb.append(Camera2ApiKeysInfo.formatHwLevel(c));
           sb.append("\n\n");
           sb.append(Camera2ApiKeysInfo.formatAvailableCapabilities(c));
-          sb.append("\n");
+          sb.append("\n\n");
           sb.append(Camera2ApiKeysInfo.formatOutputSizes(c));
           sb.append("\n\n");
           sb.append(Camera2ApiKeysInfo.formatCameraCharacteristics(c));
