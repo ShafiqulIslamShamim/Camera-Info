@@ -50,7 +50,7 @@ A lightweight and powerful Android application that provides in-depth details ab
 ## 🖼️ Screenshots
 
 | Basic Camera Info | Camcorder Info |
-|--------------------------|------------------|
+|------------------|------------------|
 | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/basic_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/camcoder_info.jpg) |
 
 | All Camera Info | All Camera Details |
