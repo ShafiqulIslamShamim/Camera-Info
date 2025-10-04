@@ -108,7 +108,9 @@ public class CameraInfoHelper {
             sb.append("35mm eqv FocalLength = ?\n");
           }
         } catch (Exception ignored) {
-          sb.append("FocalLength = ?\n");
+          if (logmode != 1) {
+            sb.append("FocalLength = ?\n");
+          }
           sb.append("35mm eqv FocalLength = ?\n");
         }
 
@@ -122,13 +124,13 @@ public class CameraInfoHelper {
           sb.append("\n\n");
           sb.append(Camera2ApiKeysInfo.formatAvailableCapabilities(c));
           sb.append("\n\n");
-          sb.append(Camera2ApiKeysInfo.formatOutputSizes(c));
+          sb.append(CameraResolationFormatter.formatOutputSizes(c));
           sb.append("\n\n");
-          sb.append(Camera2ApiKeysInfo.formatCameraCharacteristics(c));
+          sb.append(CameraCharacteristicsFormatter.formatCameraCharacteristics(c));
           sb.append("\n");
-          sb.append(Camera2ApiKeysInfo.formatRequestKeys(c));
+          sb.append(CaptureResultFormatter.formatResultKeys(c));
           sb.append("\n");
-          sb.append(Camera2ApiKeysInfo.formatResultKeys(c));
+          sb.append(CaptureRequestFormatter.formatRequestKeys(c));
         }
         sb.append("\n");
         sb.append("=================================\n\n");

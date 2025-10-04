@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.hardware.camera2.*;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.*;
 import android.util.*;
 import android.util.TypedValue;
 import android.view.*;
@@ -40,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
   FloatingActionButton shareFab;
   private CircularProgressIndicator progressIndicator;
   CameraManager cameraManager;
-  private static final long MIN_SHOW_TIME = 500; // Minimum spinner visibility in ms
-  private long showStartTime = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -166,19 +165,13 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void setInfoToTextView() {
-    // Show progress indicator
     progressIndicator.setVisibility(View.VISIBLE);
-    progressIndicator.setIndeterminate(true);
-    showStartTime = System.currentTimeMillis();
-
     textView.setText("");
 
-    // Use a single thread executor
     ExecutorService executor = Executors.newSingleThreadExecutor();
-
     executor.execute(
         () -> {
-          // Collect info
+          // Prepare text in background
           String deviceInfo = DeviceInfo.getDeviceInfoText(this);
           String cameraInformation = CameraInfoHelper.getAllCameraInfo(cameraManager);
 
@@ -195,31 +188,36 @@ public class MainActivity extends AppCompatActivity {
           int valueColor =
               getColorFromAttr(this, com.google.android.material.R.attr.colorSecondary);
 
-          android.text.SpannableStringBuilder spannableText =
+          SpannableStringBuilder spannableText =
               ColoredTextHelper.setColoredText(
                   combinedInfo.toString(), keyColor, separatorColor, valueColor);
 
-          // Switch back to UI thread
+          // Update UI incrementally to avoid blocking
           runOnUiThread(
               () -> {
-                long elapsed = System.currentTimeMillis() - showStartTime;
-                long remaining = MIN_SHOW_TIME - elapsed;
+                textView.setText("");
+                progressIndicator.setVisibility(View.GONE);
 
-                Runnable updateUI =
-                    () -> {
-                      progressIndicator.setVisibility(View.GONE);
+                final int chunkSize = 4000; // 4 KB chunks
+                final int length = spannableText.length();
 
-                      textView.setText(spannableText);
-                    };
+                new Thread(
+                        () -> {
+                          for (int i = 0; i < length; i += chunkSize) {
+                            int end = Math.min(length, i + chunkSize);
+                            CharSequence chunk = spannableText.subSequence(i, end);
 
-                if (remaining > 0) {
-                  progressIndicator.postDelayed(updateUI, remaining);
-                } else {
-                  updateUI.run();
-                }
+                            textView.post(() -> textView.append(chunk));
+
+                            try {
+                              Thread.sleep(5); // small pause lets UI breathe
+                            } catch (InterruptedException ignored) {
+                            }
+                          }
+                        })
+                    .start();
               });
 
-          // Shutdown executor
           executor.shutdown();
         });
   }

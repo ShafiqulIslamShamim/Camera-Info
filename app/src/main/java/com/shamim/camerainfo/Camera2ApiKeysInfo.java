@@ -302,7 +302,7 @@ public class Camera2ApiKeysInfo {
       return "";
     }
     String str = sparseArray.get(num.intValue());
-    return str != null ? str : String.valueOf(num);
+    return str != null ? str + "(" + String.valueOf(num) + ")" : String.valueOf(num);
   }
 
   public static String buildExtraDetails(CameraCharacteristics c) {
