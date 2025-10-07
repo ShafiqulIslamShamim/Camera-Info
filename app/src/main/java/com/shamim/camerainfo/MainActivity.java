@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     textView = findViewById(R.id.logView); // আপনার TextView এর আইডি বসান
     progressIndicator = findViewById(R.id.progress_indicator);
-    progressIndicator.setIndeterminate(true);
+    progressIndicator.setIndeterminate(false);
 
     MaterialToolbar toolbar = findViewById(R.id.topAppBar);
     setSupportActionBar(toolbar);
@@ -165,7 +165,9 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void setInfoToTextView() {
+    // 1. Show the indicator immediately
     progressIndicator.setVisibility(View.VISIBLE);
+    progressIndicator.setProgress(0);
     textView.setText("");
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -192,12 +194,12 @@ public class MainActivity extends AppCompatActivity {
               ColoredTextHelper.setColoredText(
                   combinedInfo.toString(), keyColor, separatorColor, valueColor);
 
-          // Update UI incrementally to avoid blocking
+          progressIndicator.setProgress(50, true);
+
+          // Update UI on the main thread
           runOnUiThread(
               () -> {
                 textView.setText("");
-                progressIndicator.setVisibility(View.GONE);
-
                 final int chunkSize = 4000; // 4 KB chunks
                 final int length = spannableText.length();
 
@@ -207,13 +209,33 @@ public class MainActivity extends AppCompatActivity {
                             int end = Math.min(length, i + chunkSize);
                             CharSequence chunk = spannableText.subSequence(i, end);
 
-                            textView.post(() -> textView.append(chunk));
+                            int finalI = i;
+                            textView.post(
+                                () -> {
+                                  textView.append(chunk);
+
+                                  // Calculate progress
+                                  /*         int progress = (int) (((float) (finalI + chunkSize) / length) * 100);
+                                  progressIndicator.setProgress(progress, true); // smooth animation
+
+                                  */
+                                });
 
                             try {
-                              Thread.sleep(5); // small pause lets UI breathe
+                              Thread.sleep(10); // small pause for smoother append
                             } catch (InterruptedException ignored) {
                             }
                           }
+
+                          progressIndicator.setProgress(95, true);
+
+                          // Hide the indicator after all chunks are appended
+                          textView.post(
+                              () -> {
+                                progressIndicator.setProgress(100, true);
+                                textView.postDelayed(
+                                    () -> progressIndicator.setVisibility(View.GONE), 300);
+                              });
                         })
                     .start();
               });

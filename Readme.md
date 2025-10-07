@@ -94,4 +94,4 @@ Let’s make **Camera Info** even more powerful together.
 
 ## 📦 Download
 
-📥 **[Download the latest release here](https://github.com/ShafiqulIslamShamim/Camera-Info/releases/tag/v1.4)**  
+📥 **[Download the latest release here](https://github.com/ShafiqulIslamShamim/Camera-Info/releases/tag/v1.5)**  
