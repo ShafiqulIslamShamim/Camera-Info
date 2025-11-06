@@ -49,7 +49,6 @@
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.Chip.Choice"
         android:text="Basic info"
-        android:checked="true"
       />
 
             <com.google.android.material.chip.Chip
