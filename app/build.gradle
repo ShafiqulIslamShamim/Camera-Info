@@ -1,0 +1,72 @@
+
+plugins {
+    id 'com.android.application'
+    
+}
+
+def keystorePropertiesFile = file("keystore/signing.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace 'com.shamim.camerainfo'
+    compileSdk 36
+    
+    
+    defaultConfig {
+        applicationId "com.shamim.camerainfo"
+        minSdk 23
+        targetSdk 36
+        versionCode 7
+        versionName "1.6"
+        
+        vectorDrawables { 
+            useSupportLibrary true
+        }
+        
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
+    signingConfigs {
+        release {
+            if (keystoreProperties['STORE_FILE']) {
+    storeFile file(keystoreProperties['STORE_FILE'])
+    storePassword keystoreProperties['STORE_PASSWORD']
+    keyAlias keystoreProperties['KEY_ALIAS']
+    keyPassword keystoreProperties['KEY_PASSWORD']
+}
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    
+    buildFeatures {
+        viewBinding true
+        
+    }
+    
+}
+
+dependencies {
+
+
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation "androidx.core:core-ktx:1.13.1" // or latest
+}

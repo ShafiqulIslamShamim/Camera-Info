@@ -1,0 +1,26 @@
+﻿[1.5]
+[1.5]
+[What's new!
+
+🚀 New Features & Enhancements
+ * Customizable App Theme: Added new theme settings under Settings > System. You can now choose between Follow System, Dark Mode, and Light Mode for a more personalized viewing experience.
+ 
+ * Improved Info Selection: Refined the "Select Info Type" menu for clearer access to different data views: Basic Info, All Info (comprehensive key list), and Camcorder profile info (video-specific details).
+ 
+ * Advanced Data Views: Expanded the data available under "All Info" to include more detailed system and Android environment variables (e.g., Security Patch, SDK details, supported ABIs) as well as the full list of Camera2 API characteristics, request, and result keys.
+ 
+ * Integrated Sharing: Added a dedicated share icon to the info screens, making it easier to quickly share the detailed camera report with others.
+ 
+ 
+🔧 Technical Improvements & Settings
+ * Logcat Control: Added an "Enable Logcat logging" toggle under Settings > System for advanced users to assist with troubleshooting and bug reporting.
+ 
+ * Under-the-Hood Optimizations: General stability improvements and faster information retrieval on various Android devices.
+ 
+ * Updated UI for all Settings and System menus.
+ 
+ 
+🐞 Bug Fixes
+ * Fixed a minor display issue where some resolutions were incorrectly truncated in the report view.
+ 
+ * Resolved an issue that occasionally caused a long load time when selecting "Camcorder profile info."]
