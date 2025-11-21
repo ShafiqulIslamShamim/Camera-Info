@@ -9,6 +9,7 @@ import android.util.Size;
 import android.util.SizeF;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.*;
 
 public class CameraCharacteristicsFormatter {
 
@@ -33,6 +34,17 @@ public class CameraCharacteristicsFormatter {
 
   // Main value formatter
   private static String formatValue(String name, Object value) {
+
+    // -------------------- SCALER - MANDATORY STREAM COMBINATIONS --------------------
+    if (name.equals("android.scaler.mandatoryStreamCombinations")
+        || name.equals("android.scaler.mandatoryConcurrentStreamCombinations")
+        || name.equals("android.scaler.mandatoryMaximumResolutionStreamCombinations")
+        || name.equals("android.scaler.mandatoryPreviewStabilizationOutputStreamCombinations")
+        || name.equals("android.scaler.mandatoryTenBitOutputStreamCombinations")
+        || name.equals("android.scaler.mandatoryUseCaseStreamCombinations")) {
+
+      return formatMandatoryStreamCombinations(value);
+    }
 
     // -------------------- ANDROID AUTOMOTIVE --------------------
     if (name.equals("android.automotive.lens.facing") && value instanceof int[]) {
@@ -852,5 +864,29 @@ public class CameraCharacteristicsFormatter {
 
   private static String formatArray(Object arr, String desc) {
     return formatGenericArray(arr) + " (" + desc + ")";
+  }
+
+  private static String formatMandatoryStreamCombinations(Object value) {
+    if (value == null || !value.getClass().isArray()) return "null";
+
+    int length = Array.getLength(value);
+    if (length == 0) return "[]";
+
+    return IntStream.range(0, length)
+        .mapToObj(
+            i -> {
+              Object obj = Array.get(value, i);
+              String desc = "Unknown combination";
+              if (obj != null) {
+                try {
+                  var method = obj.getClass().getMethod("getDescription");
+                  Object result = method.invoke(obj);
+                  if (result != null) desc = result.toString();
+                } catch (Exception ignored) {
+                }
+              }
+              return String.format("[%2d] %s", i, desc);
+            })
+        .collect(Collectors.joining(", "));
   }
 }

@@ -1,5 +1,5 @@
-﻿[1.5]
-[1.5]
+﻿[1.7]
+[1.7]
 [What's new!
 
 🚀 New Features & Enhancements

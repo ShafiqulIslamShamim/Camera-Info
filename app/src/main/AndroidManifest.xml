@@ -13,7 +13,7 @@
     android:name="android.permission.ACCESS_NETWORK_STATE"
   />    
     <application 
-        android:name=".CamerainfoApp"
+        android:name=".CameraInfoApp"
         android:allowBackup="true" 
         android:icon="@mipmap/ic_launcher" 
         android:roundIcon="@mipmap/ic_launcher" 
@@ -29,6 +29,8 @@
       android:label=""
     >
     </activity>
+    <activity android:name=".CrashActivity" android:exported="false" android:label="Crash Report" />
+    
         <activity 
             android:name="MainActivity" 
             android:exported="true">

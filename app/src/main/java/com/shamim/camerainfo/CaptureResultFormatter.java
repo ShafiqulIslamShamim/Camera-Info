@@ -229,7 +229,7 @@ public class CaptureResultFormatter {
         return "Gives the camera's intrinsic calibration matrix for geometric corrections";
       case "android.lens.poseTranslation":
         return "Describes the 3D position of the camera relative to its reference coordinate"
-                   + " system";
+            + " system";
       case "android.lens.poseRotation":
         return "Defines the camera's orientation relative to its reference coordinate system";
       case "android.scaler.cropRegion":

@@ -3,7 +3,6 @@ package com.shamim.camerainfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.hardware.camera2.*;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,10 +13,7 @@ import android.view.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
-import androidx.core.graphics.Insets;
 import androidx.core.text.PrecomputedTextCompat;
 import androidx.core.view.*;
 import androidx.core.widget.TextViewCompat;
@@ -33,7 +29,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
   private static final String TAG = "MainActivity";
 
@@ -46,12 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    applyLocalTheme();
+
     super.onCreate(savedInstanceState);
 
-    applySystemBarIconColors();
     ActivityContext = this;
-
     OTAUpdateHelper.checkForUpdatesIfDue(this);
 
     boolean logcat = SharedPrefValues.getValue("enable_logcat", false);
@@ -62,16 +56,6 @@ public class MainActivity extends AppCompatActivity {
       }
     }
     setContentView(R.layout.activity_main);
-
-    // ✅ Apply insets to root view
-    View rootView = findViewById(android.R.id.content);
-    ViewCompat.setOnApplyWindowInsetsListener(
-        rootView,
-        (v, insets) -> {
-          Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-          v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-          return insets;
-        });
 
     cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
@@ -230,21 +214,6 @@ public class MainActivity extends AppCompatActivity {
         });
   }
 
-  private void applyLocalTheme() {
-    String themePref = SharedPrefValues.getValue("theme_preference", "0");
-    switch (themePref) {
-      case "2": // Dark
-        setTheme(R.style.AppThemeDark);
-        break;
-      case "3": // Light
-        setTheme(R.style.AppThemeLight);
-        break;
-      default: // System/default
-        setTheme(R.style.AppTheme);
-        break;
-    }
-  }
-
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     int menuId = getResources().getIdentifier("main_menu", "menu", getPackageName());
@@ -298,30 +267,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     return super.onOptionsItemSelected(item);
-  }
-
-  private void applySystemBarIconColors() {
-    String themePref = SharedPrefValues.getValue("theme_preference", "0");
-
-    boolean isLightTheme;
-
-    switch (themePref) {
-      case "2": // Dark theme
-        isLightTheme = false;
-        break;
-      case "3": // Light theme
-        isLightTheme = true;
-        break;
-      default:
-        // Follow system theme
-        int nightModeFlags =
-            getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        isLightTheme = (nightModeFlags != Configuration.UI_MODE_NIGHT_YES);
-        break;
-    }
-
-    // Enable edge-to-edge (backward compatible)
-    EdgeToEdge.enable(this);
   }
 
   @Override

@@ -97,6 +97,40 @@ public class Camera2ApiKeysInfo {
                 cameraCharacteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL));
   }
 
+  private static String getCapabilityName(int key) {
+    switch (key) {
+      case 0:
+        return "BACKWARD_COMPATIBLE";
+      case 1:
+        return "MANUAL_SENSOR";
+      case 2:
+        return "MANUAL_POST_PROCESSING";
+      case 3:
+        return "RAW";
+      case 4:
+        return "BURST_CAPTURE";
+      case 5:
+        return "READ_SENSOR_SETTINGS";
+      case 6:
+        return "YUV_REPROCESSING";
+      case 7:
+        return "PRIVATE_REPROCESSING";
+      case 8:
+        return "DEPTH_OUTPUT";
+      case 9:
+        return "CONSTRAINED_HIGH_SPEED_VIDEO";
+      case 10:
+        return "LOGICAL_MULTI_CAMERA";
+      case 11:
+        return "DYNAMIC_RANGE_TEN_BIT";
+      case 12:
+        return "DYNAMIC_RANGE_HDR10";
+
+      default:
+        return "UNKNOWN_CAPABILITY";
+    }
+  }
+
   public static String formatOutputSizes(CameraCharacteristics cameraCharacteristics) {
     StringBuilder sb = new StringBuilder();
     StreamConfigurationMap streamConfigurationMap =
@@ -568,7 +602,20 @@ public class Camera2ApiKeysInfo {
     try {
       int[] caps = cameraCharacteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
       if (caps != null) {
-        sb.append("\nAvailableCapabilities = ").append(BuildPropHelper.objectToString(caps));
+
+        sb.append("\nAvailableCapabilities = ");
+
+        for (int i = 0; i < caps.length; i++) {
+          int cap = caps[i];
+          sb.append(String.valueOf(cap));
+          String name = getCapabilityName(cap);
+
+          sb.append("(").append(name).append(")");
+
+          if (i < caps.length - 1) {
+            sb.append(", ");
+          }
+        }
       }
     } catch (Throwable e) {
       sb.append("\nAvailableCapabilities = Error");

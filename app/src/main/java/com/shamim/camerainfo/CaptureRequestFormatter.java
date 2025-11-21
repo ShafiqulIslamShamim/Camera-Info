@@ -195,20 +195,20 @@ public class CaptureRequestFormatter {
         // -------------------- QCAMERA3 SESSION PARAMETERS --------------------
       case "org.codeaurora.qcamera3.sessionParameters.availableStreamMap":
         return "Lists the available stream configurations for session parameters on Qualcomm"
-                   + " devices";
+            + " devices";
       case "org.codeaurora.qcamera3.sessionParameters.overrideResourceCostValidation":
         return "Enables or disables validation of resource cost override for custom stream"
-                   + " handling";
+            + " handling";
       case "org.codeaurora.qcamera3.sessionParameters.enableMCTFwithReferenceFrame":
         return "Controls Multi-Frame Temporal Filtering (MCTF) with a reference frame for noise"
-                   + " reduction";
+            + " reduction";
       case "org.codeaurora.qcamera3.sessionParameters.numPCRsBeforeStreamOn":
         return "Sets the number of preview callback requests allowed before streaming starts";
 
         // -------------------- XIAOMI SESSION PARAMETERS --------------------
       case "com.xiaomi.sessionparams.clientName":
         return "Identifies the client or application name associated with the current camera"
-                   + " session";
+            + " session";
 
       default:
         return "Unknown key";
