@@ -24,3 +24,4 @@
  * Fixed a minor display issue where some resolutions were incorrectly truncated in the report view.
  
  * Resolved an issue that occasionally caused a long load time when selecting "Camcorder profile info."]
+ [https://play.google.com/store/apps/details?id=com.shamim.camerainfo]
