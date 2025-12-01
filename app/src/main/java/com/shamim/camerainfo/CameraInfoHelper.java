@@ -116,6 +116,7 @@ public class CameraInfoHelper {
 
         if (logmode == 0) {
           sb.append(Camera2ApiKeysInfo.buildExtraDetails(c));
+          sb.append(BasicCameraInfoConcate.describeAll(c));
           sb.append(Camera2ApiKeysInfo.getMoreInfos(c)).append("\n");
           sb.append("\n");
         } else if (logmode == 2) {

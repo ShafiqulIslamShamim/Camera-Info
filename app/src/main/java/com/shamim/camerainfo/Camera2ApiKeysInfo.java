@@ -398,15 +398,6 @@ public class Camera2ApiKeysInfo {
     } catch (Exception ignored) {
     }
 
-    // AE Modes
-    try {
-      int[] aeModes = c.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES);
-      if (aeModes != null) {
-        sb.append("AEModes = ").append(Arrays.toString(aeModes)).append("\n");
-      }
-    } catch (Exception ignored) {
-    }
-
     // Flash
     try {
       Boolean flash = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
@@ -414,25 +405,16 @@ public class Camera2ApiKeysInfo {
     } catch (Exception ignored) {
     }
 
-    // RAW sizes
-    try {
-      android.util.Size[] rawSizes = null;
-      if (c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP) != null) {
-        rawSizes =
-            c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                .getOutputSizes(android.graphics.ImageFormat.RAW_SENSOR);
-      }
-      if (rawSizes != null) {
-        sb.append("RAW SENSOR sizes = ").append(Arrays.toString(rawSizes)).append("\n");
-      }
-    } catch (Exception ignored) {
-    }
-
     // HW Level
     try {
       Integer hwLevel = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
       if (hwLevel != null) {
-        sb.append("SupportedHardwareLevel = ").append(getHardwareLevelName(hwLevel)).append("\n");
+        sb.append("SupportedHardwareLevel = ")
+            .append(hwLevel)
+            .append("(")
+            .append(getHardwareLevelName(hwLevel).toUpperCase())
+            .append(")")
+            .append("\n");
       }
     } catch (Exception ignored) {
     }
@@ -440,20 +422,25 @@ public class Camera2ApiKeysInfo {
     return sb.toString();
   }
 
-  public static String getHardwareLevelName(int i) {
-    switch (i) {
-      case 0:
-        return "";
-      case 1:
-        return "1 (full)";
-      case 2:
-        return "2 (legacy)";
-      case 3:
-        return "3";
-      case 4:
-        return "4 (external)";
+  public static String getHardwareLevelName(int level) {
+    switch (level) {
+      case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED:
+        return "Limited";
+
+      case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL:
+        return "Full";
+
+      case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY:
+        return "Legacy";
+
+      case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3:
+        return "Level_3";
+
+      case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL:
+        return "External";
+
       default:
-        return "Null (limited)";
+        return "Unknown";
     }
   }
 
@@ -570,55 +557,18 @@ public class Camera2ApiKeysInfo {
       sb.append("SensitivityRange = Error");
     }
 
-    // AE Compensation Range
-    try {
-      Range<Integer> aeRange =
-          cameraCharacteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE);
-      if (aeRange != null) {
-        sb.append("\nAeCompensationRange = ")
-            .append(aeRange.getLower())
-            .append(" - ")
-            .append(aeRange.getUpper());
-      }
-    } catch (Throwable e) {
-      sb.append("\nAeCompensationRange = Error");
-    }
-
     // Exposure Time Range
     try {
       Range<Long> exposureRange =
           cameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
       if (exposureRange != null) {
         sb.append("\nExposureTimeRange = ")
-            .append((float) exposureRange.getLower() / 1_000_000.0f)
+            .append(String.format("%.2f", (float) exposureRange.getLower() / 1_000_000.0f))
             .append(" - ")
-            .append((float) exposureRange.getUpper() / 1_000_000.0f);
+            .append(String.format("%.2f", (float) exposureRange.getUpper() / 1_000_000.0f));
       }
     } catch (Throwable e) {
       sb.append("\nExposureTimeRange = Error");
-    }
-
-    // Capabilities
-    try {
-      int[] caps = cameraCharacteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-      if (caps != null) {
-
-        sb.append("\nAvailableCapabilities = ");
-
-        for (int i = 0; i < caps.length; i++) {
-          int cap = caps[i];
-          sb.append(String.valueOf(cap));
-          String name = getCapabilityName(cap);
-
-          sb.append("(").append(name).append(")");
-
-          if (i < caps.length - 1) {
-            sb.append(", ");
-          }
-        }
-      }
-    } catch (Throwable e) {
-      sb.append("\nAvailableCapabilities = Error");
     }
 
     // Raw checks
