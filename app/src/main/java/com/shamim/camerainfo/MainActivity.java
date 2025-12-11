@@ -1,7 +1,7 @@
 package com.shamim.camerainfo;
 
+import android.content.*;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.*;
 import android.net.Uri;
@@ -31,6 +31,16 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends BaseActivity {
 
+  private final BroadcastReceiver themeReceiver =
+      new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+          if (ThemeActions.ACTION_THEME_CHANGED.equals(intent.getAction())) {
+            recreate(); // 🔥 Activity auto reload
+          }
+        }
+      };
+
   private static final String TAG = "MainActivity";
 
   public static MainActivity ActivityContext;
@@ -44,6 +54,15 @@ public class MainActivity extends BaseActivity {
   protected void onCreate(Bundle savedInstanceState) {
 
     super.onCreate(savedInstanceState);
+
+    SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+    boolean isFirstLaunch = prefs.getBoolean("intro_shown", false);
+
+    if (!isFirstLaunch) {
+      startActivity(new Intent(this, IntroActivity.class));
+      finish();
+      return;
+    }
 
     ActivityContext = this;
     OTAUpdateHelper.checkForUpdatesIfDue(this);
@@ -164,15 +183,18 @@ public class MainActivity extends BaseActivity {
   public void setInfoToTextView() {
     // 1. Show the indicator immediately
     progressIndicator.setVisibility(View.VISIBLE);
-    progressIndicator.setProgress(0);
+    progressIndicator.setProgress(8, true);
     textView.setText("");
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
     executor.execute(
         () -> {
+          progressIndicator.setProgress(15, true);
           // Prepare text in background
           String deviceInfo = DeviceInfo.getDeviceInfoText(this);
           String cameraInformation = CameraInfoHelper.getAllCameraInfo(cameraManager);
+
+          progressIndicator.setProgress(20, true);
 
           StringBuilder combinedInfo = new StringBuilder();
           combinedInfo.append(deviceInfo);
@@ -181,7 +203,9 @@ public class MainActivity extends BaseActivity {
           }
           combinedInfo.append(cameraInformation);
 
-          int keyColor = getColorFromAttr(this, com.google.android.material.R.attr.colorPrimary);
+          progressIndicator.setProgress(30, true);
+
+          int keyColor = getColorFromAttr(this, androidx.appcompat.R.attr.colorPrimary);
           int separatorColor =
               getColorFromAttr(this, com.google.android.material.R.attr.colorTertiary);
           int valueColor =
@@ -201,6 +225,7 @@ public class MainActivity extends BaseActivity {
           // 4. Update UI once text layout is ready
           runOnUiThread(
               () -> {
+                progressIndicator.setProgress(80, true);
 
                 // Ensure matching parameters (avoids IllegalArgumentException)
                 TextViewCompat.setTextMetricsParams(textView, precomputedText.getParams());
@@ -212,6 +237,19 @@ public class MainActivity extends BaseActivity {
 
           executor.shutdown();
         });
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    IntentFilter filter = new IntentFilter(ThemeActions.ACTION_THEME_CHANGED);
+    registerReceiver(themeReceiver, filter);
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    unregisterReceiver(themeReceiver);
   }
 
   @Override

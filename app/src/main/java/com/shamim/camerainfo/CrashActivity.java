@@ -4,7 +4,6 @@ import android.content.*;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.*;
 import android.os.Bundle;
 import android.util.*;
@@ -19,6 +18,16 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 
 public class CrashActivity extends BaseActivity {
+
+  private final BroadcastReceiver themeReceiver =
+      new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+          if (ThemeActions.ACTION_THEME_CHANGED.equals(intent.getAction())) {
+            recreate(); // 🔥 Activity auto reload
+          }
+        }
+      };
 
   private String crashLog;
 
@@ -154,5 +163,18 @@ public class CrashActivity extends BaseActivity {
       Log.e("ThemeColors", "Attribute not found: " + attrResId);
       return 0xFF00FF; // fallback magenta
     }
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    IntentFilter filter = new IntentFilter(ThemeActions.ACTION_THEME_CHANGED);
+    registerReceiver(themeReceiver, filter);
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    unregisterReceiver(themeReceiver);
   }
 }

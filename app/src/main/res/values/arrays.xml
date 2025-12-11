@@ -15,4 +15,15 @@
         <item>3</item>  <!-- MODE_NIGHT_NO -->
     </string-array>
     
+   
+    <string-array name="app_theme_options">
+        <item>Dynamic theme</item>
+        <item>Default theme</item>
+    </string-array>
+
+    <string-array name="app_theme_option_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    
     </resources>

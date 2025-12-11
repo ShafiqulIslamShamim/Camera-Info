@@ -1,49 +1,43 @@
 package com.shamim.camerainfo;
 
+import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.*;
+import android.widget.Toast;
+import androidx.activity.*;
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-  private final SharedPrefValuesBase.OnPrefChangeListener themeListener =
-      (key, newValue) -> {
-        if ("theme_preference".equals(key)) {
-          // Ensure this runs on UI thread
-          runOnUiThread(this::onThemePreferenceChanged);
+  private final BroadcastReceiver themeReceiver =
+      new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+          if (ThemeActions.ACTION_THEME_CHANGED.equals(intent.getAction())) {
+            recreate(); // 🔥 Activity auto reload
+          }
         }
       };
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
-    // Apply theme BEFORE super.onCreate()
+
+    // MUST apply theme before super.onCreate()
     applyLocalTheme();
+
+    // Modern Android edge-to-edge
+    EdgeToEdge.enable(this);
+
     super.onCreate(savedInstanceState);
-
-    // Enable edge-to-edge layout always
-    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-  }
-
-  @Override
-  protected void onStart() {
-    super.onStart();
-    // Register listener so runtime changes propagate to activities
-    SharedPrefValuesBase.addListener(themeListener);
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
-    // Unregister to avoid leaks
-    SharedPrefValuesBase.removeListener(themeListener);
   }
 
   @Override
@@ -60,34 +54,39 @@ public abstract class BaseActivity extends AppCompatActivity {
 
   private void afterContentSet() {
     setupEdgeToEdgePadding();
-
-    /*   String themePref = SharedPrefValues.getValue("theme_preference", "0");
-    if ("0".equals(themePref)) {
-        // Follow system -> let EdgeToEdge handle appearance automatically
-        EdgeToEdge.enable(this);
-    } else {
-    */
-    // Manual: set status/nav bar icon colors based on chosen theme
     getWindow().getDecorView().post(this::applySystemBarAppearance);
   }
 
-  // Apply theme from prefs (must be called before super.onCreate)
+  // THEME LOGIC (Light/Dark + AppTheme/AppThemeDefault)
   protected void applyLocalTheme() {
-    String themePref = SharedPrefValues.getValue("theme_preference", "0");
-    switch (themePref) {
-      case "2": // Dark
-        setTheme(R.style.AppThemeDark);
-        break;
-      case "3": // Light
-        setTheme(R.style.AppThemeLight);
-        break;
-      default: // Follow system
-        setTheme(R.style.AppTheme);
-        break;
+    boolean isLight = isLightThemeActive();
+    String appThemePref = SharedPrefValues.getValue("app_theme_preference", "0");
+
+    final int themeRes;
+
+    if (appThemePref.equals("0")) {
+      themeRes = isLight ? R.style.AppThemeLight : R.style.AppThemeDark;
+    } else {
+      themeRes = isLight ? R.style.AppThemeDefaultLight : R.style.AppThemeDefaultDark;
     }
+
+    setTheme(themeRes);
   }
 
-  // Manual system bar appearance (for non-follow-system)
+  @Override
+  protected void onStart() {
+    super.onStart();
+    IntentFilter filter = new IntentFilter(ThemeActions.ACTION_THEME_CHANGED);
+    registerReceiver(themeReceiver, filter);
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    unregisterReceiver(themeReceiver);
+  }
+
+  // Status + Navigation bar icon color (Light/Dark)
   protected void applySystemBarAppearance() {
     boolean isLight = isLightThemeActive();
 
@@ -99,6 +98,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     controller.setAppearanceLightNavigationBars(isLight);
   }
 
+  // Edge-to-edge safe padding
   private void setupEdgeToEdgePadding() {
     View root = findViewById(android.R.id.content);
     if (root == null) return;
@@ -112,25 +112,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         });
   }
 
+  // Detect whether current UI should be "light" appearance
   private boolean isLightThemeActive() {
+
     String themePref = SharedPrefValues.getValue("theme_preference", "0");
+
     switch (themePref) {
-      case "2": // Dark
+      case "2": // Dark forced
         return false;
-      case "3": // Light
+
+      case "3": // Light forced
         return true;
-      default:
+
+      default: // Follow system
         int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
         return mode != Configuration.UI_MODE_NIGHT_YES;
     }
-  }
-
-  /**
-   * Called when theme_preference changes at runtime. Default: recreate() to apply theme cleanly.
-   * Override in a concrete activity if you want different behavior.
-   */
-  protected void onThemePreferenceChanged() {
-    recreate();
   }
 
   protected void showToast(String message) {

@@ -1,45 +1,118 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:key="main_settings"
   android:title="Settings"
 >
 
-<PreferenceScreen
-    android:icon="@drawable/android_24px"
-    android:key="pref_screen_system_key"
+<PreferenceCategory
+    android:layout="@layout/m3_preference_category_layout"
+    android:key="pref_category_system_key"
     android:title="System"
   >
     <com.shamim.camerainfo.MaterialListPreference
-      android:icon="@drawable/routine_24px"
-      android:key="theme_preference"
+      android:icon="@drawable/palette_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:key="app_theme_preference"
       android:title="App theme"
+      android:summary="%s"
+      android:entries="@array/app_theme_options"
+      android:entryValues="@array/app_theme_option_values"
+      android:defaultValue="0"
+    />
+    
+    <com.shamim.camerainfo.MaterialListPreference
+      android:icon="@drawable/routine_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:key="theme_preference"
+      android:title="Select mode"
       android:summary="%s"
       android:entries="@array/theme_options"
       android:entryValues="@array/theme_option_values"
       android:defaultValue="0"
     />
-            
+
     <com.shamim.camerainfo.StringSwitchPreference
       android:icon="@drawable/code_24px"
+      android:layout="@layout/m3_preference_layout"
       android:key="enable_logcat"
       android:title="Enable Logcat"
       android:summary="Turn on to enable logcat logging"
       android:defaultValue="false"
-    />        
-    </PreferenceScreen>
-
-
-<PreferenceScreen
-    android:icon="@drawable/info_24px"
-    android:key="pref_screen_info_key"
-    android:title="About info"
-  >
-    <com.shamim.camerainfo.AboutInfoPreference
-      android:key="pref_about_info_key"
-      android:title=""
-      android:summary=""
     />
-    </PreferenceScreen>
+    </PreferenceCategory>
+
+
+<PreferenceCategory
+    android:layout="@layout/m3_preference_category_layout"
+    android:key="pref_category_info_key"
+    android:title="About"
+  >
+    <Preference
+      android:icon="@drawable/account_circle_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="Developed by"
+      android:key="pref_developer_name_key"
+      android:summary="Shafiqul Islam Shamim"
+    >
+                    </Preference>
+                    <Preference
+      android:icon="@drawable/newspaper_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="News"
+      android:key="pref_news_information_key"
+      android:summary="Stay informed about updates and other news."
+    >
+                    </Preference>
+            <Preference
+      android:icon="@drawable/update_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="Check for updates"
+      android:key="pref_updates_checker_key"
+      android:summary="Thanks to those developers who helped me for making this mod."
+    >
+            </Preference>
+            <Preference
+      android:icon="@drawable/shield_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="Privacy policy"
+      android:key="pref_privacy_policy_key"
+      android:summary="Privacy policy • Terms &amp; conditions."
+    >
+            </Preference>
+    </PreferenceCategory>
     
+    
+    <PreferenceCategory
+    android:layout="@layout/m3_preference_category_layout"
+    android:key="pref_category_support_key"
+    android:title="Support"
+  >
+    <Preference
+      android:icon="@drawable/star_rate_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="Rate it"
+      android:key="pref_rate_it_key"
+      android:summary="Every rate will encourage to make the app more better."
+    >
+                    </Preference>
+                    <Preference
+      android:icon="@drawable/ads_click_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="Try more apps"
+      android:key="pref_try_more_apps_key"
+      android:summary="All my apps are available in this link."
+    >
+                    </Preference>
+            <Preference
+      android:icon="@drawable/feedback_24px"
+      android:layout="@layout/m3_preference_layout"
+      android:title="Feedback"
+      android:key="pref_feedback_key"
+      android:summary="Tell us how we can improve more or report issues."
+    >
+            </Preference>
+    </PreferenceCategory>
+
 </PreferenceScreen>

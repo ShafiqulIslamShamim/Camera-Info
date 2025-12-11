@@ -5,7 +5,6 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.google.android.material.R;
 
 public class DialogUtils {
 
@@ -34,7 +33,9 @@ public class DialogUtils {
 
     // Apply colorPrimary
     TypedValue typedValue = new TypedValue();
-    if (context.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true)) {
+    if (context
+        .getTheme()
+        .resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)) {
       customTitle.setTextColor(typedValue.data);
     }
 

@@ -19,8 +19,8 @@ android {
         applicationId "com.shamim.camerainfo"
         minSdk 23
         targetSdk 36
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.9"
         
         vectorDrawables { 
             useSupportLibrary true
@@ -65,8 +65,10 @@ dependencies {
 
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation "androidx.core:core-ktx:1.13.1" // or latest
+    implementation "androidx.activity:activity:1.9.0"
+    implementation 'androidx.documentfile:documentfile:1.1.0'
+    implementation "com.airbnb.android:lottie:6.7.1"
 }

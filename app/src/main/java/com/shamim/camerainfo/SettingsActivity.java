@@ -1,15 +1,25 @@
 package com.shamim.camerainfo;
 
+import android.content.*;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.*;
 import android.graphics.*;
+import android.net.Uri;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.*;
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -19,7 +29,27 @@ public class SettingsActivity extends BaseActivity {
   private static final String EXTRA_PARENT_TITLE = "parent_title";
   private static final String PREF_CHANGE_FLAG = "preference_changed";
 
-  private Toolbar toolbar;
+  //  Preference Keys
+  public static final String KEY_DEVELOPER = "pref_developer_name_key";
+  public static final String KEY_NEWS = "pref_news_information_key";
+  public static final String KEY_CHECK_UPDATES = "pref_updates_checker_key";
+  public static final String KEY_PRIVACY = "pref_privacy_policy_key";
+
+  public static final String KEY_RATE_IT = "pref_rate_it_key";
+  public static final String KEY_MORE_APPS = "pref_try_more_apps_key";
+  public static final String KEY_FEEDBACK = "pref_feedback_key";
+
+  private final BroadcastReceiver themeReceiver =
+      new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+          if (ThemeActions.ACTION_THEME_CHANGED.equals(intent.getAction())) {
+            recreate(); // 🔥 Activity auto reload
+          }
+        }
+      };
+
+  private MaterialToolbar toolbar;
 
   public static Intent createIntent(
       Context context, String prefKey, String prefTitle, String parentKey, String parentTitle) {
@@ -43,14 +73,15 @@ public class SettingsActivity extends BaseActivity {
     setContentView(R.layout.activity_settings);
 
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    prefs.edit().putBoolean(PREF_CHANGE_FLAG, false).apply();
 
     toolbar = findViewById(R.id.toolbar);
+    CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
     setSupportActionBar(toolbar);
 
     if (getSupportActionBar() != null) {
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);
       getSupportActionBar().setDisplayShowTitleEnabled(true);
+      collapsingToolbar.setTitle("Settings");
     }
 
     String prefKey = getIntent().getStringExtra(EXTRA_PREF_KEY);
@@ -84,19 +115,37 @@ public class SettingsActivity extends BaseActivity {
   }
 
   @Override
+  protected void onStart() {
+    super.onStart();
+    IntentFilter filter = new IntentFilter(ThemeActions.ACTION_THEME_CHANGED);
+    registerReceiver(themeReceiver, filter);
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    unregisterReceiver(themeReceiver);
+  }
+
+  @Override
   public void onBackPressed() {
     String parentKey = getIntent().getStringExtra(EXTRA_PARENT_KEY);
-    if (parentKey == null) {
+
+    if (parentKey == null) { // Root screen
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
       boolean prefChanged = prefs.getBoolean(PREF_CHANGE_FLAG, false);
+
       if (prefChanged) {
+        // Reset after refreshing MainActivity
         prefs.edit().putBoolean(PREF_CHANGE_FLAG, false).apply();
+
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
       } else {
         super.onBackPressed();
       }
+
     } else {
       super.onBackPressed();
     }
@@ -136,11 +185,6 @@ public class SettingsActivity extends BaseActivity {
           .unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-      sharedPreferences.edit().putBoolean(PREF_CHANGE_FLAG, true).apply();
-    }
-
     private void setupPreferenceScreenListeners(PreferenceScreen preferenceScreen) {
       String parentKey = preferenceScreen.getKey();
       String parentTitle =
@@ -165,6 +209,138 @@ public class SettingsActivity extends BaseActivity {
           setupPreferenceScreenListeners(subScreen);
         }
       }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+      sharedPreferences.edit().putBoolean(PREF_CHANGE_FLAG, true).apply();
+
+      // শুধু theme_preference হলে
+      if (key.equals("theme_preference") || key.equals("app_theme_preference")) {
+
+        // 🔥 Global Broadcast
+        requireContext().sendBroadcast(new Intent(ThemeActions.ACTION_THEME_CHANGED));
+      }
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+
+      String key = preference.getKey();
+      Context ctx = getContext();
+
+      switch (key) {
+        case KEY_DEVELOPER:
+          // Developer Telegram
+          openUrl(ctx, "https://t.me/md_shamim12");
+          return true;
+
+        case KEY_NEWS:
+          showNewsDialog(ctx);
+          return true;
+
+        case KEY_CHECK_UPDATES:
+          // OTA update checker
+          OTAUpdateHelper.hookPreference(ctx);
+          return true;
+
+        case KEY_PRIVACY:
+          openUrl(
+              ctx,
+              "https://github.com/ShafiqulIslamShamim/Camera-Info/blob/main/PrivacyPolicy.txt");
+          return true;
+
+        case KEY_RATE_IT:
+          openUrl(ctx, "https://play.google.com/store/apps/details?id=com.shamim.camerainfo");
+          return true;
+
+        case KEY_MORE_APPS:
+          openUrl(
+              ctx, "https://play.google.com/store/search?q=pub:Shafiqul%20Islam%20Shamim&c=apps");
+          return true;
+
+        case KEY_FEEDBACK:
+          openEmail(ctx, "shafiqulislamshamimofficial@gmail.com");
+          return true;
+      }
+
+      return super.onPreferenceTreeClick(preference);
+    }
+
+    // -----------------------
+    // 🔗 Utility Methods
+    // -----------------------
+
+    private void openUrl(Context context, String url) {
+      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+      context.startActivity(intent);
+    }
+
+    public static void openEmail(@NonNull Context context, @NonNull String toEmail) {
+
+      String appName = "Unknown App";
+      String versionName = "unknown";
+      int versionCode = -1;
+
+      try {
+        PackageManager pm = context.getPackageManager();
+        PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+
+        appName =
+            pm.getApplicationLabel(pm.getApplicationInfo(context.getPackageName(), 0)).toString();
+
+        versionName = pi.versionName != null ? versionName : "unknown";
+        versionCode = pi.versionCode;
+
+      } catch (Exception ignored) {
+      }
+
+      String subject = "Feedback - " + appName + " v" + versionName + " (Code " + versionCode + ")";
+
+      Intent intent = new Intent(Intent.ACTION_SENDTO);
+      intent.setData(Uri.parse("mailto:")); // <-- MUST be plain mailto
+      intent.putExtra(Intent.EXTRA_EMAIL, new String[] {toEmail});
+      intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+      context.startActivity(Intent.createChooser(intent, "Send Feedback"));
+    }
+
+    private void showNewsDialog(Context ctx) {
+
+      // Items
+      String[] titles = {"Facebook Page", "GitHub Repository"};
+      int[] icons = {R.drawable.facebook, R.drawable.github};
+
+      // RecyclerView Adapter
+      NewsAdapter adapter =
+          new NewsAdapter(
+              titles,
+              icons,
+              pos -> {
+                if (pos == 0) {
+                  // Facebook
+                  openUrl(ctx, "https://www.facebook.com/share/18wbmDDERe/");
+                } else if (pos == 1) {
+                  // GitHub
+                  openUrl(ctx, "https://github.com/ShafiqulIslamShamim/");
+                }
+              });
+
+      // RecyclerView Layout
+      RecyclerView recyclerView = new RecyclerView(ctx);
+      recyclerView.setLayoutManager(new LinearLayoutManager(ctx));
+      recyclerView.setAdapter(adapter);
+      recyclerView.setPadding(30, 30, 30, 30);
+
+      // Material Dialog
+      new MaterialAlertDialogBuilder(ctx)
+          .setTitle("News & Updates")
+          .setView(recyclerView)
+          .setPositiveButton("Close", null)
+          .show();
     }
   }
 }
