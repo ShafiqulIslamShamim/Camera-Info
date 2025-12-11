@@ -49,17 +49,17 @@ A lightweight and powerful Android application that provides in-depth details ab
 
 ## 🖼️ Screenshots
 
-| Basic Camera Info | Camcorder Info |
+| Camera Info Intro | Basic Camera Info |
 |------------------|------------------|
-| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/basic_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/camcoder_info.jpg) |
+| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/intro.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/basic_info.jpg) |
 
 | All Camera Info | All Camera Details |
 |-------------|----------------|
 | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/all_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/all_info_details.jpg) |
 
-| Settings Activity | About Info Activity |
+| Camcorder Info | Settings Activity |
 |--------------------------|------------------------|
-| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/settings.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/about_info.jpg) |
+| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/camcoder_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/settings.jpg) |
 
 ---
 
