@@ -70,7 +70,7 @@
       android:layout="@layout/m3_preference_layout"
       android:title="Check for updates"
       android:key="pref_updates_checker_key"
-      android:summary="Thanks to those developers who helped me for making this mod."
+      android:summary="Download link will be available here if update is available."
     >
             </Preference>
             <Preference
