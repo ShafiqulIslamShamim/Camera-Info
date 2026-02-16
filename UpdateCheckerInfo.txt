@@ -1,5 +1,5 @@
-﻿[2.2]
-[2.2]
+﻿[2.3]
+[2.3]
 [What's new!
 
 🚀 New Features & Enhancements
