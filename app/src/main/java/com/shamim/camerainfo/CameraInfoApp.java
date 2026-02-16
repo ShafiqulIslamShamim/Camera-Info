@@ -9,6 +9,7 @@ import com.shamim.camerainfo.preference.*;
 import com.shamim.camerainfo.recycle_view.*;
 import com.shamim.camerainfo.update_checker.*;
 import com.shamim.camerainfo.util.*;
+import io.github.mohammedbaqernull.seasonal.SeasonalEffects;
 
 public class CameraInfoApp extends Application {
   private static Context appContext;
@@ -16,7 +17,14 @@ public class CameraInfoApp extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    CrashHandler.getInstance().registerGlobal(this);
     AppContext.init(this);
+
+    boolean seasonalEffect = SharedPrefValues.getValue("disable_seasonal_effect", false);
+
+    if (seasonalEffect != true && GlobalWinterSystem.isWinterNow()) {
+      SeasonalEffects.INSTANCE.init(this);
+      SeasonalEffects.INSTANCE.enableChristmas();
+      SeasonalEffects.INSTANCE.setSnowflakeCount(20);
+    }
   }
 }

@@ -25,6 +25,7 @@ public class CamcorderProfileLogger {
     for (int quality : getAllQualityValues()) {
       try {
         if (CamcorderProfile.hasProfile(cameraId, quality)) {
+          @SuppressWarnings("deprecation")
           CamcorderProfile profile = CamcorderProfile.get(cameraId, quality);
           profiles.add(formatProfile(profile, quality));
         } else {

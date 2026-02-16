@@ -5,9 +5,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.preference.PreferenceManager;
 import com.shamim.camerainfo.activity.*;
 import com.shamim.camerainfo.c2api_key.*;
 import com.shamim.camerainfo.preference.*;
@@ -28,11 +28,15 @@ import java.util.regex.Pattern;
 public class LogcatSaver {
 
   private static final String TAG = "LogcatSaver";
+  private static String appName;
 
   /**
    * Start saving logcat data to file. Uses SAF on Android 11+, legacy storage for older versions.
    */
   public static void RunLog(Context context) {
+
+    appName = context.getApplicationInfo().loadLabel(context.getPackageManager()).toString();
+
     if (Build.VERSION.SDK_INT >= 30) {
       // Android 11+ (Scoped Storage)
       saveLogToScopedStorage(context);
@@ -61,7 +65,8 @@ public class LogcatSaver {
     }
 
     String fileName =
-        "CameraInfo_Logcat_"
+        appName
+            + "_Logcat_"
             + Build.MANUFACTURER
             + "_"
             + Build.MODEL
@@ -111,7 +116,7 @@ public class LogcatSaver {
 
   /** Legacy storage: Write logs to /storage/emulated/0 */
   private static void saveLogToLegacyStorage() {
-    File dir = new File(Environment.getExternalStorageDirectory(), "CameraInfo/Logcat");
+    File dir = new File(Environment.getExternalStorageDirectory(), appName + "/Logcat");
 
     if (dir.exists()) {
       deleteRecursive(dir);
@@ -122,7 +127,7 @@ public class LogcatSaver {
     }
 
     String fileName =
-        "CameraInfo_" + Build.MANUFACTURER + "_" + Build.MODEL + "(" + Build.DEVICE + ")" + ".json";
+        appName + "_" + Build.MANUFACTURER + "_" + Build.MODEL + "(" + Build.DEVICE + ")" + ".json";
 
     File file = new File(dir, fileName);
     String buildInfo = BuildPropHelper.getBuildPropInfo("android.os.Build");

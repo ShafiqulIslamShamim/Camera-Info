@@ -1,7 +1,8 @@
 
 plugins {
     id 'com.android.application'
-    
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 def keystorePropertiesFile = file("keystore/signing.properties")
@@ -17,10 +18,10 @@ android {
     
     defaultConfig {
         applicationId "com.shamim.camerainfo"
-        minSdk 23
+        minSdk 26
         targetSdk 36
-        versionCode 12
-        versionName "2.1"
+        versionCode 13
+        versionName "2.2"
         
         vectorDrawables { 
             useSupportLibrary true
@@ -53,15 +54,19 @@ android {
     }
 
     
-    buildFeatures {
+  /*  buildFeatures {
         viewBinding true
         
     }
+    */
     
 }
 
-dependencies {
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ["-Xlint:all"]
+}
 
+dependencies {
 
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.appcompat:appcompat:1.7.1")
@@ -71,4 +76,11 @@ dependencies {
     implementation "androidx.activity:activity:1.9.0"
     implementation 'androidx.documentfile:documentfile:1.1.0'
     implementation "com.airbnb.android:lottie:6.7.1"
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation "com.github.mdbqnull:seasonal-effects-android:1.0.0"
 }

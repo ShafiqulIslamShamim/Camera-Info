@@ -19,6 +19,7 @@
     android:supportsRtl="true"
     android:theme="@style/AppThemeDark"
     android:requestLegacyExternalStorage="true"
+    android:enableOnBackInvokedCallback="true"
   >
         
             <activity
@@ -29,12 +30,6 @@
     </activity>
     <activity android:name=".activity.IntroActivity">
     </activity>
-    
-    <activity
-      android:name=".activity.CrashActivity"
-      android:exported="false"
-      android:label="Crash Report"
-    />
     
         <activity android:name=".activity.MainActivity" android:exported="true">
             <intent-filter>

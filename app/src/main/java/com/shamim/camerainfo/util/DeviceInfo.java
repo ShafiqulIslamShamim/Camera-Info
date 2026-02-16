@@ -1,10 +1,9 @@
 package com.shamim.camerainfo.util;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Point;
+import android.graphics.*;
 import android.os.Build;
-import android.view.Display;
+import android.view.*;
 import android.view.WindowManager;
 import com.shamim.camerainfo.activity.*;
 import com.shamim.camerainfo.c2api_key.*;
@@ -45,9 +44,24 @@ public class DeviceInfo {
   }
 
   public static String getResolutionString() {
-    Display defaultDisplay =
-        ((WindowManager) getAppContext().getSystemService(Context.WINDOW_SERVICE))
-            .getDefaultDisplay();
+    WindowManager windowManager =
+        (WindowManager) getAppContext().getSystemService(Context.WINDOW_SERVICE);
+
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      // Modern approach for API 30+
+      android.view.WindowMetrics windowMetrics = windowManager.getCurrentWindowMetrics();
+      android.graphics.Rect bounds = windowMetrics.getBounds();
+      return bounds.width() + "x" + bounds.height();
+    } else {
+      // Legacy approach for older devices
+      return getLegacyResolutionString(windowManager);
+    }
+  }
+
+  @SuppressWarnings("deprecation")
+  public static String getLegacyResolutionString(WindowManager windowManager) {
+
+    Display defaultDisplay = windowManager.getDefaultDisplay();
     Point point = new Point();
     defaultDisplay.getRealSize(point);
     return point.x + "x" + point.y;
@@ -55,12 +69,17 @@ public class DeviceInfo {
 
   public static String getSystemLanguage() {
     Context context = getAppContext();
-    try {
-      context.getPackageManager().getResourcesForApplication("android");
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
+    android.content.res.Configuration config = context.getResources().getConfiguration();
+
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+      // Modern approach for API 24+
+      return config.getLocales().get(0).getLanguage();
+    } else {
+      // Legacy approach
+      @SuppressWarnings("deprecation")
+      String systemLan = config.locale.getLanguage();
+      return systemLan;
     }
-    return context.getResources().getConfiguration().locale.getLanguage();
   }
 
   public static String getTotalRAM() {

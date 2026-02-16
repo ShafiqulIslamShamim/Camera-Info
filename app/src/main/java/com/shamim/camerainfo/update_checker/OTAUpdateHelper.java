@@ -3,9 +3,9 @@ package com.shamim.camerainfo.update_checker;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.*;
 import android.net.Uri;
+import android.os.*;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Base64;
@@ -38,11 +38,28 @@ public class OTAUpdateHelper {
   public static boolean isInternetAvailable(@NonNull Context context) {
     ConnectivityManager cm =
         (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    if (cm != null) {
-      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-      return activeNetwork != null && activeNetwork.isConnected();
+    if (cm == null) return false;
+
+    // For Android Q (API 29) and above
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      Network network = cm.getActiveNetwork();
+      if (network == null) return false;
+      NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+      return capabilities != null
+          && (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+              || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+              || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
+    } else {
+      // Fallback for older devices
+      return checkInternetConnectionLegacy(cm);
     }
-    return false;
+  }
+
+  @SuppressWarnings("deprecation")
+  public static boolean checkInternetConnectionLegacy(ConnectivityManager cm) {
+    android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    return activeNetwork != null && activeNetwork.isConnected();
   }
 
   public static String getVersionName(Context context) {
@@ -265,13 +282,15 @@ public class OTAUpdateHelper {
                         context, "Update Available: " + remoteVersion));
 
         if (HtmlDetector.isHtml(changelog)) {
-          Spanned formatted;
+
           if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            formatted = Html.fromHtml(changelog, Html.FROM_HTML_MODE_LEGACY);
+            Spanned formatted = Html.fromHtml(changelog, Html.FROM_HTML_MODE_LEGACY);
+            changelogBuilder.setMessage(formatted);
           } else {
-            formatted = Html.fromHtml(changelog);
+            @SuppressWarnings("deprecation")
+            Spanned formatted = Html.fromHtml(changelog);
+            changelogBuilder.setMessage(formatted);
           }
-          changelogBuilder.setMessage(formatted);
         } else {
           changelogBuilder.setMessage(changelog);
         }
@@ -294,6 +313,8 @@ public class OTAUpdateHelper {
             label = "Dropbox";
           } else if (link.contains("github.com")) {
             label = "GitHub Release";
+          } else if (link.contains("play.google.com")) {
+            label = "Play Store";
           } else {
             label = "Direct Download (Mirror " + mirrorCount + ")";
           }

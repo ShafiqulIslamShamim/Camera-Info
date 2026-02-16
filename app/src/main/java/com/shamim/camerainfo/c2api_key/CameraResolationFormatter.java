@@ -118,7 +118,7 @@ public class CameraResolationFormatter {
   }
 
   public static String formatSizes(StreamConfigurationMap streamConfigurationMap, Class<?> cls) {
-    if (streamConfigurationMap == null || !streamConfigurationMap.isOutputSupportedFor(cls)) {
+    if (streamConfigurationMap == null || !StreamConfigurationMap.isOutputSupportedFor(cls)) {
       return String.format(Locale.US, "%s sizes: []", cls.getSimpleName());
     }
 
@@ -202,6 +202,7 @@ public class CameraResolationFormatter {
       }
     }
 
+    @SuppressWarnings("deprecation")
     Class<?>[] outputClasses =
         new Class<?>[] {
           ImageReader.class,
@@ -212,7 +213,7 @@ public class CameraResolationFormatter {
           MediaRecorder.class
         };
     for (Class<?> cls : outputClasses) {
-      if (streamConfigurationMap.isOutputSupportedFor(cls)) {
+      if (StreamConfigurationMap.isOutputSupportedFor(cls)) {
         sb.append(formatSizes(streamConfigurationMap, cls)).append("\n\n");
       }
     }

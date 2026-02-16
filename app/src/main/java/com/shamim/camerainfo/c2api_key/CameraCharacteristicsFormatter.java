@@ -108,6 +108,7 @@ public class CameraCharacteristicsFormatter {
     }
 
     if (name.equals("android.control.aeAvailableTargetFpsRanges") && value.getClass().isArray()) {
+      @SuppressWarnings("unchecked")
       Range<Integer>[] ranges = (Range<Integer>[]) value;
       List<String> list = new ArrayList<>();
       for (Range<Integer> range : ranges) {

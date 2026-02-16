@@ -1,7 +1,6 @@
 package com.shamim.camerainfo.activity;
 
 import android.content.*;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,8 +8,10 @@ import android.content.pm.*;
 import android.graphics.*;
 import android.net.Uri;
 import android.os.Bundle;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.*;
 import androidx.annotation.NonNull;
+import androidx.core.content.pm.PackageInfoCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -45,16 +46,6 @@ public class SettingsActivity extends BaseActivity {
   public static final String KEY_RATE_IT = "pref_rate_it_key";
   public static final String KEY_MORE_APPS = "pref_try_more_apps_key";
   public static final String KEY_FEEDBACK = "pref_feedback_key";
-
-  private final BroadcastReceiver themeReceiver =
-      new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-          if (ThemeActions.ACTION_THEME_CHANGED.equals(intent.getAction())) {
-            recreate(); // 🔥 Activity auto reload
-          }
-        }
-      };
 
   private MaterialToolbar toolbar;
 
@@ -113,57 +104,47 @@ public class SettingsActivity extends BaseActivity {
     if (getSupportActionBar() != null) {
       getSupportActionBar().setTitle(prefTitle != null ? prefTitle : "Settings");
     }
+
+    // Onbackpressed modern handling
+    getOnBackPressedDispatcher()
+        .addCallback(
+            this,
+            new OnBackPressedCallback(true) {
+              @Override
+              public void handleOnBackPressed() {
+
+                String parentKey = getIntent().getStringExtra(EXTRA_PARENT_KEY);
+
+                if (parentKey == null) { // Root screen
+
+                  SharedPreferences prefs =
+                      PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this);
+
+                  boolean prefChanged = prefs.getBoolean(PREF_CHANGE_FLAG, false);
+
+                  if (prefChanged) {
+                    // Reset flag
+                    prefs.edit().putBoolean(PREF_CHANGE_FLAG, false).apply();
+
+                    Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                    intent.setFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    return;
+                  }
+                }
+
+                // Default back behavior
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+              }
+            });
   }
 
   @Override
   public boolean onSupportNavigateUp() {
-    onBackPressed();
+    getOnBackPressedDispatcher().onBackPressed();
     return true;
-  }
-
-  @Override
-  protected void onStart() {
-    super.onStart();
-    IntentFilter filter = new IntentFilter(ThemeActions.ACTION_THEME_CHANGED);
-
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-      registerReceiver(themeReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-    } else {
-      registerReceiver(themeReceiver, filter);
-    }
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
-    try {
-      unregisterReceiver(themeReceiver);
-    } catch (IllegalArgumentException ignored) {
-    }
-  }
-
-  @Override
-  public void onBackPressed() {
-    String parentKey = getIntent().getStringExtra(EXTRA_PARENT_KEY);
-
-    if (parentKey == null) { // Root screen
-      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-      boolean prefChanged = prefs.getBoolean(PREF_CHANGE_FLAG, false);
-
-      if (prefChanged) {
-        // Reset after refreshing MainActivity
-        prefs.edit().putBoolean(PREF_CHANGE_FLAG, false).apply();
-
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-      } else {
-        super.onBackPressed();
-      }
-
-    } else {
-      super.onBackPressed();
-    }
   }
 
   public static class SettingsFragment extends PreferenceFragmentCompat
@@ -228,15 +209,32 @@ public class SettingsActivity extends BaseActivity {
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+      if (key == null || key.isEmpty()) return;
       sharedPreferences.edit().putBoolean(PREF_CHANGE_FLAG, true).apply();
 
-      // শুধু theme_preference হলে
-      if (key.equals("theme_preference") || key.equals("app_theme_preference")) {
+      if (key.equals("disable_seasonal_effect")) {
+        restartAppDelayed(requireContext());
 
-        // 🔥 Global Broadcast
-        requireContext().sendBroadcast(new Intent(ThemeActions.ACTION_THEME_CHANGED));
       }
+
+      // শুধু theme_preference হলে
+      else if (key.equals("theme_preference") || key.equals("app_theme_preference")) {
+
+        requireActivity().recreate();
+      }
+    }
+
+    private void restartAppDelayed(Context context) {
+      new android.os.Handler(android.os.Looper.getMainLooper())
+          .postDelayed(
+              () -> {
+                Intent intent = new Intent(context, SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+
+                System.exit(0);
+              },
+              400);
     }
 
     @Override
@@ -306,7 +304,7 @@ public class SettingsActivity extends BaseActivity {
             pm.getApplicationLabel(pm.getApplicationInfo(context.getPackageName(), 0)).toString();
 
         versionName = pi.versionName != null ? versionName : "unknown";
-        versionCode = pi.versionCode;
+        versionCode = (int) PackageInfoCompat.getLongVersionCode(pi);
 
       } catch (Exception ignored) {
       }

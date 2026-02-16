@@ -92,15 +92,14 @@ public class Camera2ApiKeysInfo {
   public static String formatCameraFacing(CameraCharacteristics cameraCharacteristics) {
     return "Facing: "
         + getValueFromMap(
-            sLensFacing, (Integer) cameraCharacteristics.get(CameraCharacteristics.LENS_FACING));
+            sLensFacing, cameraCharacteristics.get(CameraCharacteristics.LENS_FACING));
   }
 
   public static String formatHwLevel(CameraCharacteristics cameraCharacteristics) {
     return "SupportedHardwareLevel = "
         + getValueFromMap(
             sHardwareLevelMap,
-            (Integer)
-                cameraCharacteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL));
+            cameraCharacteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL));
   }
 
   private static String getCapabilityName(int key) {
@@ -140,8 +139,7 @@ public class Camera2ApiKeysInfo {
   public static String formatOutputSizes(CameraCharacteristics cameraCharacteristics) {
     StringBuilder sb = new StringBuilder();
     StreamConfigurationMap streamConfigurationMap =
-        (StreamConfigurationMap)
-            cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
     if (streamConfigurationMap != null) {
       int[] outputFormats = streamConfigurationMap.getOutputFormats();
       sb.append("Output formats: [");
@@ -159,7 +157,6 @@ public class Camera2ApiKeysInfo {
       boolean isOutputSupportedFor = StreamConfigurationMap.isOutputSupportedFor(ImageReader.class);
       boolean isOutputSupportedFor2 =
           StreamConfigurationMap.isOutputSupportedFor(SurfaceTexture.class);
-      boolean isOutputSupportedFor3 = StreamConfigurationMap.isOutputSupportedFor(Allocation.class);
       boolean isOutputSupportedFor4 = StreamConfigurationMap.isOutputSupportedFor(MediaCodec.class);
       boolean isOutputSupportedFor5 =
           StreamConfigurationMap.isOutputSupportedFor(MediaRecorder.class);
@@ -171,10 +168,7 @@ public class Camera2ApiKeysInfo {
         sb.append(formatSizes(streamConfigurationMap, SurfaceTexture.class));
         sb.append("\n\n");
       }
-      if (isOutputSupportedFor3) {
-        sb.append(formatSizes(streamConfigurationMap, Allocation.class));
-        sb.append("\n\n");
-      }
+      getAllocationClass(streamConfigurationMap, sb);
       if (isOutputSupportedFor4) {
         sb.append(formatSizes(streamConfigurationMap, MediaCodec.class));
         sb.append("\n\n");
@@ -188,11 +182,22 @@ public class Camera2ApiKeysInfo {
     return sb.toString();
   }
 
+  @SuppressWarnings("deprecation")
+  private static void getAllocationClass(
+      StreamConfigurationMap streamConfigurationMap, StringBuilder sb) {
+
+    boolean isOutputSupportedFor3 = StreamConfigurationMap.isOutputSupportedFor(Allocation.class);
+
+    if (isOutputSupportedFor3) {
+      sb.append(formatSizes(streamConfigurationMap, Allocation.class));
+      sb.append("\n\n");
+    }
+  }
+
   public static String formatAvailableCapabilities(CameraCharacteristics cameraCharacteristics) {
     if (cameraCharacteristics != null) {
       StringBuilder sb = new StringBuilder("Available capabilities: [");
-      int[] iArr =
-          (int[]) cameraCharacteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+      int[] iArr = cameraCharacteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
       if (iArr != null) {
         for (int i = 0; i < iArr.length; i++) {
           sb.append(getValueFromMap(sCapabilitiesMap, Integer.valueOf(iArr[i])));
@@ -266,7 +271,7 @@ public class Camera2ApiKeysInfo {
     Size[] m =
         Build.VERSION.SDK_INT >= 23 ? streamConfigurationMap.getHighResolutionOutputSizes(i) : null;
     if (m != null && m.length != 0) {
-      outputSizes = (Size[]) concatenate(outputSizes, m);
+      outputSizes = concatenate(outputSizes, m);
     }
     StringBuilder sb =
         new StringBuilder(String.format(Locale.US, "%s sizes: \n[", getFormatName(i)));
@@ -290,7 +295,7 @@ public class Camera2ApiKeysInfo {
     return sb.toString();
   }
 
-  public static String formatSizes(StreamConfigurationMap streamConfigurationMap, Class cls) {
+  public static String formatSizes(StreamConfigurationMap streamConfigurationMap, Class<?> cls) {
     Size[] outputSizes = streamConfigurationMap.getOutputSizes(cls);
     StringBuilder sb =
         new StringBuilder(String.format(Locale.US, "%s sizes: \n[", cls.getSimpleName()));
@@ -465,12 +470,14 @@ public class Camera2ApiKeysInfo {
   }
 
   public static <T> T[] concatenate(T[] tArr, T[] tArr2) {
-    int length = tArr.length;
-    int length2 = tArr2.length;
-    T[] tArr3 =
-        (T[]) ((Object[]) Array.newInstance(tArr.getClass().getComponentType(), length + length2));
-    System.arraycopy(tArr, 0, tArr3, 0, length);
-    System.arraycopy(tArr2, 0, tArr3, length, length2);
+    // Arrays.copyOf creates a new array of the same type as tArr
+    // with the combined length of both arrays.
+    T[] tArr3 = Arrays.copyOf(tArr, tArr.length + tArr2.length);
+
+    // We only need to copy the second array,
+    // as copyOf already filled the first part.
+    System.arraycopy(tArr2, 0, tArr3, tArr.length, tArr2.length);
+
     return tArr3;
   }
 
