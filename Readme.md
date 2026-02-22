@@ -1,4 +1,17 @@
-# 📷 Camera Info App  
+# 📷 Camera Info App
+
+<div align="center">
+
+  <img src="assets/logo.png" alt="Camera-Info Logo" width="120" height="120" />
+  <br/>
+  <br/>
+  
+**Detailed Camera & System Specs for Android Geeks**
+  
+  [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android)](https://www.android.com/)
+  [![License](https://img.shields.io/badge/License-Apache-blue?style=flat-square)]()
+
+</div>
 
 A lightweight and powerful Android application that provides in-depth details about your device’s camera hardware and system environment. Perfect for developers, testers, and power users who need quick and reliable camera diagnostics.  
 
@@ -49,17 +62,18 @@ A lightweight and powerful Android application that provides in-depth details ab
 
 ## 🖼️ Screenshots
 
-| Camera Info Intro | Basic Camera Info |
-|------------------|------------------|
-| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/intro.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/basic_info.jpg) |
+| ![ss-1] | ![ss-2] | ![ss-3] |
+| ------- | ------- | ------- |
+| ![ss-4] | ![ss-5] | ![ss-6] |
+| ![ss-7] |
 
-| All Camera Info | All Camera Details |
-|-------------|----------------|
-| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/all_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/all_info_details.jpg) |
-
-| Camcorder Info | Settings Activity |
-|--------------------------|------------------------|
-| ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/camcoder_info.jpg) | ![](https://github.com/ShafiqulIslamShamim/Camera-Info/raw/main/screenshots/settings.jpg) |
+[ss-1]: screenshots/1.jpg
+[ss-2]: screenshots/2.jpg
+[ss-3]: screenshots/3.jpg
+[ss-4]: screenshots/4.jpg
+[ss-5]: screenshots/5.jpg
+[ss-6]: screenshots/6.jpg
+[ss-7]: screenshots/7.jpg
 
 ---
 
@@ -92,6 +106,12 @@ Let’s make **Camera Info** even more powerful together.
 
 ---
 
-## 📦 Download
+## Get it from
 
-📥 **[Download the latest release here](https://play.google.com/store/apps/details?id=com.shamim.camerainfo)**  
+<div align="center">
+
+<a href="https://play.google.com/store/apps/details?id=com.shamim.camerainfo"><img src="assets/play.png" height="50"></a>
+
+</div>
+
+---
