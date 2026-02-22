@@ -34,7 +34,7 @@
     />
     
     <com.shamim.camerainfo.preference.StringSwitchPreference
-      android:icon="@drawable/code_24px"
+      android:icon="@drawable/ac_unit_24px"
       android:layout="@layout/m3_preference_layout"
       android:key="disable_seasonal_effect"
       android:title="Seasonal effect"

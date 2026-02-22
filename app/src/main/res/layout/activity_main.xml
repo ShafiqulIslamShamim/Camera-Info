@@ -1,88 +1,88 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:background="?attr/colorSurface"
 >
 
-    <!-- 🔹 Top App Bar -->
-    <com.google.android.material.appbar.MaterialToolbar
-    android:id="@+id/topAppBar"
-    android:layout_width="0dp"
-    android:layout_height="41dp"
-    android:background="?attr/colorSurface"
-    android:title="@string/app_name"
-    android:titleTextColor="?attr/colorOnSurface"
-    app:navigationIconTint="?attr/colorOnSurface"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-  />
-
-    <!-- 🔹 Horizontal scrollable ChipGroup -->
-    <HorizontalScrollView
-    android:id="@+id/chipScrollView"
-    android:layout_width="0dp"
+    <com.google.android.material.appbar.AppBarLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:scrollbars="none"
-    app:layout_constraintTop_toBottomOf="@id/topAppBar"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
+    android:background="?attr/colorSurface"
   >
 
-        <com.google.android.material.chip.ChipGroup
-      android:id="@+id/LogChipGroup"
-      android:layout_width="wrap_content"
+        <com.google.android.material.appbar.MaterialToolbar
+      android:id="@+id/topAppBar"
+      android:layout_width="match_parent"
+      android:layout_height="41dp"
+      android:title="@string/app_name"
+      android:background="?attr/colorSurface"
+      app:layout_scrollFlags="scroll|enterAlways"
+    />
+
+        <HorizontalScrollView
+      android:id="@+id/chipScrollView"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:paddingStart="16dp"
-      android:paddingEnd="16dp"
-      app:chipSpacingHorizontal="8dp"
-      app:singleLine="true"
-      app:singleSelection="true"
-      app:selectionRequired="true"
+      android:background="?attr/colorSurface"
+      android:scrollbars="none"
+      app:layout_scrollFlags="scroll|enterAlways"
     >
 
-            <com.google.android.material.chip.Chip
-        android:id="@+id/chipBasicMode"
+            <com.google.android.material.chip.ChipGroup
+        android:id="@+id/LogChipGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Chip.Choice"
-        android:text="Basic info"
-      />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:chipSpacingHorizontal="8dp"
+        app:singleLine="true"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+      >
 
-            <com.google.android.material.chip.Chip
-        android:id="@+id/chipAllMode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Chip.Choice"
-        android:text="All info"
-      />
+                <com.google.android.material.chip.Chip
+          android:id="@+id/chipBasicMode"
+          style="@style/Widget.MaterialComponents.Chip.Choice"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Basic info"
+          app:checkedIcon="@drawable/ic_check"
+          app:checkedIconVisible="true"
+        />
 
-            <com.google.android.material.chip.Chip
-        android:id="@+id/chipCamcorderProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Chip.Choice"
-        android:text="Camcorder profile info"
-      />
+                <com.google.android.material.chip.Chip
+          android:id="@+id/chipAllMode"
+          style="@style/Widget.MaterialComponents.Chip.Choice"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="All info"
+          app:checkedIcon="@drawable/ic_check"
+          app:checkedIconVisible="true"
+        />
 
-            <!-- প্রয়োজনে আরও চিপ যোগ করতে পারো -->
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
+                <com.google.android.material.chip.Chip
+          android:id="@+id/chipCamcorderProfile"
+          style="@style/Widget.MaterialComponents.Chip.Choice"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Camcorder profile info"
+          app:checkedIcon="@drawable/ic_check"
+          app:checkedIconVisible="true"
+        />
 
-    <!-- 🔹 ScrollView for log text -->
-    <ScrollView
+                </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
     android:id="@+id/scrollView"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    app:layout_constraintTop_toBottomOf="@id/chipScrollView"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:scrollbars="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
   >
 
         <LinearLayout
@@ -91,55 +91,49 @@
       android:orientation="vertical"
     >
 
-            <!-- Log View -->
             <TextView
         android:id="@+id/logView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:textSize="15sp"
-        android:textIsSelectable="true"
-        android:padding="10dp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="10dp"
         android:ellipsize="none"
+        android:padding="10dp"
         android:singleLine="false"
-        tools:text="TextView"
+        android:textIsSelectable="true"
+        android:textSize="15sp"
+        tools:text=""
       />
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- 🔹 Centered circular progress indicator -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
     android:id="@+id/progress_indicator"
     style="@style/Widget.Material3.CircularProgressIndicator"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:max="100"
+    android:visibility="gone"
     app:indicatorSize="48dp"
     app:trackThickness="4dp"
-    android:visibility="gone"
-    android:max="100"
     app:waveAmplitude="2dp"
-    app:wavelength="10dp"
     app:waveSpeed="18dp"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
+    app:wavelength="10dp"
   />
 
-    <!-- 🔹 Floating action button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
     android:id="@+id/sharetext"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="50dp"
+    android:contentDescription="Share"
     android:enabled="true"
     android:focusable="true"
-    android:layout_margin="50dp"
     android:src="@drawable/share_24px"
-    android:contentDescription="Share"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
   />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
