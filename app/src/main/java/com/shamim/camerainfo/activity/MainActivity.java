@@ -63,6 +63,8 @@ public class MainActivity extends BaseActivity {
   private final java.util.ArrayList<Integer> matchOffsets = new java.util.ArrayList<>();
   private int currentMatchIndex = -1;
   private String currentSearchQuery = "";
+  private final android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+  private Runnable searchRunnable;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -190,7 +192,11 @@ public class MainActivity extends BaseActivity {
       public void afterTextChanged(android.text.Editable s) {
         currentSearchQuery = s.toString();
         currentMatchIndex = 0;
-        updateSearchHighlights();
+        if (searchRunnable != null) {
+          searchHandler.removeCallbacks(searchRunnable);
+        }
+        searchRunnable = () -> updateSearchHighlights();
+        searchHandler.postDelayed(searchRunnable, 250);
       }
     });
 
@@ -395,7 +401,12 @@ public class MainActivity extends BaseActivity {
       int highlightColor = 0x66FFEB3B; // Yellow with 40% opacity
       int currentHighlightColor = 0xFFFF9800; // Orange or bright yellow for current match
       
-      for (int i = 0; i < matchCount; i++) {
+      // Limit the rendering to 50 matches before and 50 matches after the current match to prevent extreme UI lag on large text
+      int windowSize = 50;
+      int startHighlight = Math.max(0, currentMatchIndex - windowSize);
+      int endHighlight = Math.min(matchCount - 1, currentMatchIndex + windowSize);
+      
+      for (int i = startHighlight; i <= endHighlight; i++) {
         int start = matchOffsets.get(i);
         int end = start + currentSearchQuery.length();
         int color = (i == currentMatchIndex) ? currentHighlightColor : highlightColor;

@@ -15,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.appupdate.AppUpdateOptions;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
 
@@ -88,8 +89,8 @@ public class OTAUpdateHelper {
             try {
               appUpdateManager.startUpdateFlowForResult(
                   appUpdateInfo,
-                  AppUpdateType.IMMEDIATE,
                   activity,
+                  AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
                   RC_APP_UPDATE);
             } catch (Exception e) {
               e.printStackTrace();
@@ -133,8 +134,8 @@ public class OTAUpdateHelper {
         try {
           appUpdateManager.startUpdateFlowForResult(
               appUpdateInfo,
-              AppUpdateType.IMMEDIATE,
               activity,
+              AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
               RC_APP_UPDATE);
         } catch (Exception e) {
           e.printStackTrace();
@@ -164,8 +165,8 @@ public class OTAUpdateHelper {
                 try {
                   appUpdateManager.startUpdateFlowForResult(
                       appUpdateInfo,
-                      AppUpdateType.IMMEDIATE,
                       activity,
+                      AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
                       RC_APP_UPDATE);
                 } catch (Exception e) {
                   e.printStackTrace();
