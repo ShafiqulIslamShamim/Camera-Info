@@ -1,0 +1,6 @@
+{
+  "name": "Camera Info",
+  "description": "Inspect and search comprehensive hardware sensor profiles, camera capabilities, and device configurations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

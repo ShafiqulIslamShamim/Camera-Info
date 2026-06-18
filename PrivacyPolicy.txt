@@ -1,0 +1,41 @@
+Privacy Policy for Camera Info
+
+This Privacy Policy explains what information the Camera Info app collects, how it is used, and your choices regarding your data.
+
+
+1. Information We Collect
+The Camera Info app is primarily an information utility tool. We do not require you to register an account, nor do we collect any personally identifiable information (PII) such as your name, email address, or contact list.
+
+A. Device Information (Displayed and Used Locally)
+The app accesses and displays technical details about your device and its camera hardware, as determined by the selected mode (Basic Info, All Info, or Camcorder profile info), including:
+ * Device Model, Manufacturer, and Android Version/Fingerprint.
+ * Detailed camera specifications (e.g., sensor size, resolution, focal length, supported video qualities).
+ * System build and security patch information.
+This information is processed locally on your device to generate the report. We do not transmit this device information to our servers or to any third party.
+
+B. Log Data (Optional)
+If you manually enable the "Enable Logcat logging" option in the app's settings, the app will log technical data related to the app's performance and system interactions.
+ * Logcat data is not automatically collected or transmitted to us. It is stored on your device.
+ * We may only receive this data if you voluntarily choose to manually export and share these logs with us (e.g., via email) for the purpose of troubleshooting a specific issue you report.
+ 
+ 
+2. How We Use Information
+Since we do not collect or store any personal data from you, there is nothing for us to use, sell, or share.
+Any technical information the app accesses is solely used for its intended purpose: to display the camera and system information to you, the user, on your device.
+
+
+3. Sharing Your Information
+We do not share, sell, rent, or trade any information with third parties.
+ * The app includes a share icon that allows you to manually share the generated camera info report with a person or service of your choice (e.g., copy to clipboard, share via email or messaging app). This action is entirely initiated and controlled by the user.
+ 
+ 
+4. Security
+While we collect no personal data, we strive to protect all information accessed locally on your device. Since all processing is done locally without network transmission, the data is secured by your device's operating system security.
+
+
+5. Changes to This Policy
+We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy within the app or on our website. You are advised to review this Privacy Policy periodically for any changes.
+
+
+6. Contact Us
+If you have any questions or suggestions about this Privacy Policy, please contact us at: [shafiqulislamshamimofficial@gmail.com]
