@@ -47,7 +47,29 @@ jobs:
         run: |
           mkdir -p keystore
 
-          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > keystore/release.jks
+          echo "Secret length: ${#RELEASE_KEYSTORE_BASE64}"
+
+          # Remove spaces/newlines and decode
+          echo "$RELEASE_KEYSTORE_BASE64" | tr -d '\r\n\t ' > keystore.txt
+
+          python3 << 'EOF'
+          import base64
+
+          with open("keystore.txt", "r") as f:
+              data = f.read().strip()
+
+          try:
+              decoded = base64.b64decode(data, validate=True)
+              with open("keystore/release.jks", "wb") as out:
+                  out.write(decoded)
+
+              print("Keystore decoded successfully")
+              print("Decoded size:", len(decoded), "bytes")
+
+          except Exception as e:
+              print("Invalid Base64:", e)
+              raise
+          EOF
 
           cat > keystore/Signature.properties <<EOF
           STORE_FILE=keystore/release.jks
