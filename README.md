@@ -72,7 +72,7 @@ A lightweight and powerful Android application that provides in-depth details ab
 | ![ss-1] | ![ss-2] | ![ss-3] |
 | ------- | ------- | ------- |
 | ![ss-4] | ![ss-5] | ![ss-6] |
-| ![ss-7] |
+| ![ss-7] | ![ss-8] |
 
 [ss-1]: screenshots/1.jpg
 [ss-2]: screenshots/2.jpg
@@ -81,6 +81,7 @@ A lightweight and powerful Android application that provides in-depth details ab
 [ss-5]: screenshots/5.jpg
 [ss-6]: screenshots/6.jpg
 [ss-7]: screenshots/7.jpg
+[ss-8]: screenshots/8.jpg
 
 ---
 
