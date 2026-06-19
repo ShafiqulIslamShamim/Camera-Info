@@ -64,10 +64,14 @@ public class MainActivity extends BaseActivity {
   private LinearProgressIndicator searchProgressIndicator;
 
   private SpannableStringBuilder cachedSpannableText = null;
+  private androidx.core.text.PrecomputedTextCompat cachedPrecomputedText = null;
   private String cachedPlainText = "";
   private String cachedLowerPlainText = "";
   private String lastSearchQuery = "";
-  private final java.util.concurrent.ExecutorService searchExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
+  private final java.util.concurrent.ThreadPoolExecutor searchExecutor =
+      new java.util.concurrent.ThreadPoolExecutor(
+          1, 1, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+          new java.util.concurrent.LinkedBlockingQueue<Runnable>());
   private java.util.concurrent.Future<?> currentSearchFuture = null;
   private int searchGeneration = 0;
   private final java.util.ArrayList<Integer> matchOffsets = new java.util.ArrayList<>();
@@ -213,7 +217,7 @@ public class MainActivity extends BaseActivity {
           updateSearchHighlights(true);
         } else {
           searchRunnable = () -> updateSearchHighlights(true);
-          searchHandler.postDelayed(searchRunnable, 1500);
+          searchHandler.postDelayed(searchRunnable, 1100);
         }
       }
     });
@@ -293,6 +297,7 @@ public class MainActivity extends BaseActivity {
 
   public void setInfoToTextView() {
     cachedSpannableText = null;
+    cachedPrecomputedText = null;
     cachedPlainText = "";
     cachedLowerPlainText = "";
     lastSearchQuery = "";
@@ -353,6 +358,7 @@ public class MainActivity extends BaseActivity {
                 TextViewCompat.setPrecomputedText(textView, precomputedText);
 
                 cachedSpannableText = spannableText;
+                cachedPrecomputedText = precomputedText;
                 cachedPlainText = plainText;
                 cachedLowerPlainText = lowerPlainText;
 
@@ -407,6 +413,11 @@ public class MainActivity extends BaseActivity {
     if (currentSearchFuture != null) {
       currentSearchFuture.cancel(true);
     }
+    try {
+      searchExecutor.getQueue().clear();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     final String query = currentSearchQuery;
     final int targetIndex = currentMatchIndex;
@@ -420,7 +431,11 @@ public class MainActivity extends BaseActivity {
       if (searchProgressIndicator != null) {
         searchProgressIndicator.setVisibility(View.GONE);
       }
-      textView.setText(cachedSpannableText != null ? cachedSpannableText : "");
+      if (cachedPrecomputedText != null) {
+        androidx.core.widget.TextViewCompat.setPrecomputedText(textView, cachedPrecomputedText);
+      } else {
+        textView.setText(cachedSpannableText != null ? cachedSpannableText : "");
+      }
       return;
     }
 
