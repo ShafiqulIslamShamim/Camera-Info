@@ -5,11 +5,24 @@ on:
     branches:
       - main
       - master
+
   pull_request:
     branches:
       - main
       - master
+
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Select build type"
+        required: true
+        default: all
+        type: choice
+        options:
+          - debug
+          - release-apk
+          - release-aab
+          - all
 
 jobs:
   build:
@@ -26,7 +39,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
           cache: gradle
 
       - name: Make gradlew executable
@@ -50,7 +63,6 @@ jobs:
 
           echo "Secret length: ${#RELEASE_KEYSTORE_BASE64}"
 
-          # Remove spaces/newlines and decode
           echo "$RELEASE_KEYSTORE_BASE64" | tr -d '\r\n\t ' > keystore.txt
 
           python3 << 'EOF'
@@ -59,17 +71,13 @@ jobs:
           with open("keystore.txt", "r") as f:
               data = f.read().strip()
 
-          try:
-              decoded = base64.b64decode(data, validate=True)
-              with open("app/keystore/release.jks", "wb") as out:
-                  out.write(decoded)
+          decoded = base64.b64decode(data, validate=True)
 
-              print("Keystore decoded successfully")
-              print("Decoded size:", len(decoded), "bytes")
+          with open("app/keystore/release.jks", "wb") as out:
+              out.write(decoded)
 
-          except Exception as e:
-              print("Invalid Base64:", e)
-              raise
+          print("Keystore decoded successfully")
+          print("Decoded size:", len(decoded), "bytes")
           EOF
 
           cat > app/keystore/Signature.properties <<EOF
@@ -80,9 +88,11 @@ jobs:
           EOF
 
       - name: Build Debug APK
+        if: github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == 'all' || github.event_name == 'push' || github.event_name == 'pull_request'
         run: ./gradlew assembleDebug
 
       - name: Upload Debug APK
+        if: github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == 'all' || github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
@@ -90,9 +100,11 @@ jobs:
           if-no-files-found: error
 
       - name: Build Release APK
+        if: github.event.inputs.build_type == 'release-apk' || github.event.inputs.build_type == 'all' || github.event_name == 'push' || github.event_name == 'pull_request'
         run: ./gradlew assembleRelease
 
       - name: Upload Release APK
+        if: github.event.inputs.build_type == 'release-apk' || github.event.inputs.build_type == 'all' || github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
@@ -100,9 +112,11 @@ jobs:
           if-no-files-found: error
 
       - name: Build Release AAB
+        if: github.event.inputs.build_type == 'release-aab' || github.event.inputs.build_type == 'all' || github.event_name == 'push' || github.event_name == 'pull_request'
         run: ./gradlew bundleRelease
 
       - name: Upload Release AAB
+        if: github.event.inputs.build_type == 'release-aab' || github.event.inputs.build_type == 'all' || github.event_name == 'push' || github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: release-aab

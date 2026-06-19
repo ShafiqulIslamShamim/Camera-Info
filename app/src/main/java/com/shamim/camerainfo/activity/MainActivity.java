@@ -70,7 +70,7 @@ public class MainActivity extends BaseActivity {
   private String lastSearchQuery = "";
   private final java.util.concurrent.ThreadPoolExecutor searchExecutor =
       new java.util.concurrent.ThreadPoolExecutor(
-          1, 1, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+          2, 8, 5L, java.util.concurrent.TimeUnit.SECONDS,
           new java.util.concurrent.LinkedBlockingQueue<Runnable>());
   private java.util.concurrent.Future<?> currentSearchFuture = null;
   private int searchGeneration = 0;
@@ -190,6 +190,37 @@ public class MainActivity extends BaseActivity {
     // Initialize Search UI Components
     searchBar = findViewById(R.id.search_bar);
     searchInput = findViewById(R.id.search_input);
+    searchInput.setFilters(new android.text.InputFilter[] {
+      new android.text.InputFilter() {
+        @Override
+        public java.lang.CharSequence filter(
+            java.lang.CharSequence source, int start, int end,
+            android.text.Spanned dest, int dstart, int dend) {
+          if (source == null) return null;
+          boolean hasLinebreakerOrTab = false;
+          for (int i = start; i < end; i++) {
+            char c = source.charAt(i);
+            if (c == '\n' || c == '\r' || c == '\t') {
+              hasLinebreakerOrTab = true;
+              break;
+            }
+          }
+          if (hasLinebreakerOrTab) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = start; i < end; i++) {
+              char c = source.charAt(i);
+              if (c == '\n' || c == '\r' || c == '\t') {
+                sb.append(' ');
+              } else {
+                sb.append(c);
+              }
+            }
+            return sb.toString();
+          }
+          return null;
+        }
+      }
+    });
     searchCount = findViewById(R.id.search_count);
     searchPrev = findViewById(R.id.search_prev);
     searchNext = findViewById(R.id.search_next);
@@ -423,7 +454,7 @@ public class MainActivity extends BaseActivity {
     final int targetIndex = currentMatchIndex;
     final int generation = ++searchGeneration;
 
-    if (query.isEmpty()) {
+    if (query.trim().isEmpty()) {
       lastSearchQuery = "";
       matchOffsets.clear();
       currentMatchIndex = -1;
@@ -471,6 +502,9 @@ public class MainActivity extends BaseActivity {
         while (index >= 0) {
           if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
           localMatches.add(index);
+          if (localMatches.size() >= 1000) {
+            break;
+          }
           index = textStrLower.indexOf(queryLower, index + 1);
         }
       } else {

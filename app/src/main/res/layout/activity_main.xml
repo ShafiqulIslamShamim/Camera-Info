@@ -138,7 +138,6 @@
                         android:textColorHint="?attr/colorOnSurfaceVariant"
                         android:textSize="14sp"
                         android:maxLines="1"
-                        android:singleLine="true"
                     />
 
                     <TextView
