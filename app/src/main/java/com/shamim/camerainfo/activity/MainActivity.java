@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.text.style.BackgroundColorSpan;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -60,6 +61,12 @@ public class MainActivity extends BaseActivity {
   private ImageButton searchNext;
   private ImageButton searchClose;
 
+  private SpannableStringBuilder cachedSpannableText = null;
+  private String cachedPlainText = "";
+  private String lastSearchQuery = "";
+  private final java.util.concurrent.ExecutorService searchExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
+  private java.util.concurrent.Future<?> currentSearchFuture = null;
+  private int searchGeneration = 0;
   private final java.util.ArrayList<Integer> matchOffsets = new java.util.ArrayList<>();
   private int currentMatchIndex = -1;
   private String currentSearchQuery = "";
@@ -195,8 +202,8 @@ public class MainActivity extends BaseActivity {
         if (searchRunnable != null) {
           searchHandler.removeCallbacks(searchRunnable);
         }
-        searchRunnable = () -> updateSearchHighlights();
-        searchHandler.postDelayed(searchRunnable, 250);
+        searchRunnable = () -> updateSearchHighlights(true);
+        searchHandler.postDelayed(searchRunnable, 150);
       }
     });
 
@@ -214,14 +221,14 @@ public class MainActivity extends BaseActivity {
     searchPrev.setOnClickListener(v -> {
       if (!matchOffsets.isEmpty()) {
         currentMatchIndex = (currentMatchIndex - 1 + matchOffsets.size()) % matchOffsets.size();
-        updateSearchHighlights();
+        updateSearchHighlights(false);
       }
     });
 
     searchNext.setOnClickListener(v -> {
       if (!matchOffsets.isEmpty()) {
         currentMatchIndex = (currentMatchIndex + 1) % matchOffsets.size();
-        updateSearchHighlights();
+        updateSearchHighlights(false);
       }
     });
 
@@ -270,9 +277,15 @@ public class MainActivity extends BaseActivity {
   }
 
   public void setInfoToTextView() {
+    cachedSpannableText = null;
+    cachedPlainText = "";
+    lastSearchQuery = "";
     // 1. Show the indicator immediately
-    progressIndicator.setVisibility(View.VISIBLE);
-    progressIndicator.setProgress(8, true);
+    if (progressIndicator != null) {
+      progressIndicator.setIndeterminate(false);
+      progressIndicator.setVisibility(View.VISIBLE);
+      progressIndicator.setProgress(8, true);
+    }
     textView.setText("");
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -320,8 +333,11 @@ public class MainActivity extends BaseActivity {
                 TextViewCompat.setTextMetricsParams(textView, precomputedText.getParams());
                 TextViewCompat.setPrecomputedText(textView, precomputedText);
 
+                cachedSpannableText = spannableText;
+                cachedPlainText = combinedInfo.toString();
+
                 if (!currentSearchQuery.isEmpty()) {
-                  updateSearchHighlights();
+                  updateSearchHighlights(true);
                 }
 
                 progressIndicator.setProgress(100, true);
@@ -335,10 +351,14 @@ public class MainActivity extends BaseActivity {
   private void openSearch() {
     searchBar.setVisibility(View.VISIBLE);
     searchInput.requestFocus();
-    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-    if (imm != null) {
-      imm.showSoftInput(searchInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-    }
+    searchInput.postDelayed(() -> {
+      if (!isDestroyed() && !isFinishing()) {
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+          imm.showSoftInput(searchInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+        }
+      }
+    }, 100);
   }
 
   private void closeSearch() {
@@ -349,83 +369,131 @@ public class MainActivity extends BaseActivity {
     if (imm != null) {
       imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
     }
-    updateSearchHighlights();
+    updateSearchHighlights(true);
   }
 
   private void updateSearchHighlights() {
-    CharSequence text = textView.getText();
-    if (text == null || text.length() == 0) {
+    updateSearchHighlights(false);
+  }
+
+  private void updateSearchHighlights(boolean forceRequery) {
+    if (progressIndicator != null) {
+      progressIndicator.setIndeterminate(true);
+      progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    if (currentSearchFuture != null) {
+      currentSearchFuture.cancel(true);
+    }
+
+    final String query = currentSearchQuery;
+    final int targetIndex = currentMatchIndex;
+    final int generation = ++searchGeneration;
+
+    if (query.isEmpty()) {
+      lastSearchQuery = "";
       matchOffsets.clear();
       currentMatchIndex = -1;
       searchCount.setText("0/0");
-      return;
-    }
-
-    SpannableStringBuilder spannable;
-    if (text instanceof SpannableStringBuilder) {
-      spannable = (SpannableStringBuilder) text;
-    } else {
-      spannable = new SpannableStringBuilder(text);
-    }
-
-    BackgroundColorSpan[] searchSpans = 
-        spannable.getSpans(0, spannable.length(), BackgroundColorSpan.class);
-    for (BackgroundColorSpan span : searchSpans) {
-      spannable.removeSpan(span);
-    }
-
-    if (currentSearchQuery.isEmpty()) {
-      matchOffsets.clear();
-      currentMatchIndex = -1;
-      searchCount.setText("0/0");
-      textView.setText(spannable);
-      return;
-    }
-
-    String textStr = text.toString().toLowerCase();
-    String queryLower = currentSearchQuery.toLowerCase();
-    matchOffsets.clear();
-
-    int index = textStr.indexOf(queryLower);
-    while (index >= 0) {
-      matchOffsets.add(index);
-      index = textStr.indexOf(queryLower, index + 1);
-    }
-
-    int matchCount = matchOffsets.size();
-    if (matchCount > 0) {
-      if (currentMatchIndex < 0 || currentMatchIndex >= matchCount) {
-        currentMatchIndex = 0;
+      if (progressIndicator != null) {
+        progressIndicator.setVisibility(View.GONE);
       }
-      
-      int highlightColor = 0x66FFEB3B; // Yellow with 40% opacity
-      int currentHighlightColor = 0xFFFF9800; // Orange or bright yellow for current match
-      
-      // Limit the rendering to 50 matches before and 50 matches after the current match to prevent extreme UI lag on large text
-      int windowSize = 50;
-      int startHighlight = Math.max(0, currentMatchIndex - windowSize);
-      int endHighlight = Math.min(matchCount - 1, currentMatchIndex + windowSize);
-      
-      for (int i = startHighlight; i <= endHighlight; i++) {
-        int start = matchOffsets.get(i);
-        int end = start + currentSearchQuery.length();
-        int color = (i == currentMatchIndex) ? currentHighlightColor : highlightColor;
+      textView.setText(cachedSpannableText != null ? cachedSpannableText : "");
+      return;
+    }
+
+    // Ensure cache is available
+    if (cachedSpannableText == null) {
+      CharSequence text = textView.getText();
+      cachedSpannableText = new SpannableStringBuilder(text != null ? text : "");
+      cachedPlainText = cachedSpannableText.toString();
+    }
+
+    final String searchTargetText = cachedPlainText;
+    final SpannableStringBuilder baseSpannable = cachedSpannableText;
+
+    // Fast-path: If query hasn't changed, we don't need to re-find matches!
+    boolean needRequery = forceRequery || !query.equals(lastSearchQuery) || matchOffsets.isEmpty();
+
+    currentSearchFuture = searchExecutor.submit(() -> {
+      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+
+      final java.util.ArrayList<Integer> localMatches;
+      if (needRequery) {
+        final String queryLower = query.toLowerCase();
+        final String textStrLower = searchTargetText.toLowerCase();
+        localMatches = new java.util.ArrayList<>();
+
+        int index = textStrLower.indexOf(queryLower);
+        while (index >= 0) {
+          if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+          localMatches.add(index);
+          index = textStrLower.indexOf(queryLower, index + 1);
+        }
+      } else {
+        // Reuse precalculated matches
+        localMatches = new java.util.ArrayList<>(matchOffsets);
+      }
+
+      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+
+      final SpannableStringBuilder spannable = new SpannableStringBuilder(baseSpannable);
+      final int matchCount = localMatches.size();
+      final int finalMatchIndex;
+      if (matchCount > 0) {
+        if (targetIndex < 0 || targetIndex >= matchCount) {
+          finalMatchIndex = 0;
+        } else {
+          finalMatchIndex = targetIndex;
+        }
+
+        int highlightColor = 0x66FFEB3B; // Yellow with 40% opacity
+        int currentHighlightColor = 0xFFFF9800; // Orange or bright yellow for current match
         
-        spannable.setSpan(
-            new BackgroundColorSpan(color),
-            start,
-            end,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int windowSize = 50;
+        int startHighlight = Math.max(0, finalMatchIndex - windowSize);
+        int endHighlight = Math.min(matchCount - 1, finalMatchIndex + windowSize);
+        
+        for (int i = startHighlight; i <= endHighlight; i++) {
+          if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+          int start = localMatches.get(i);
+          int end = start + query.length();
+          int color = (i == finalMatchIndex) ? currentHighlightColor : highlightColor;
+          
+          spannable.setSpan(
+              new BackgroundColorSpan(color),
+              start,
+              end,
+              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+      } else {
+        finalMatchIndex = -1;
       }
-      
-      searchCount.setText((currentMatchIndex + 1) + "/" + matchCount);
-      scrollToOffset(matchOffsets.get(currentMatchIndex));
-    } else {
-      currentMatchIndex = -1;
-      searchCount.setText("0/0");
-    }
 
-    textView.setText(spannable);
+      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+
+      searchHandler.post(() -> {
+        if (generation != searchGeneration) return;
+
+        matchOffsets.clear();
+        matchOffsets.addAll(localMatches);
+        currentMatchIndex = finalMatchIndex;
+        lastSearchQuery = query;
+
+        textView.setText(spannable);
+
+        if (matchCount > 0) {
+          searchCount.setText((currentMatchIndex + 1) + "/" + matchCount);
+          scrollToOffset(matchOffsets.get(currentMatchIndex));
+        } else {
+          searchCount.setText("0/0");
+        }
+
+        if (progressIndicator != null) {
+          progressIndicator.setVisibility(View.GONE);
+        }
+      });
+    });
   }
 
   private void scrollToOffset(int offset) {
@@ -493,5 +561,15 @@ public class MainActivity extends BaseActivity {
   protected void onResume() {
     super.onResume();
     OTAUpdateHelper.checkForUpdatesIfDue(this);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    try {
+      searchExecutor.shutdownNow();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

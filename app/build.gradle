@@ -85,6 +85,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
     implementation "com.github.mdbqnull:seasonal-effects-android:1.0.0"
+    implementation "com.caverock:androidsvg:1.4"
 }
 
 task createSigningAndFirebaseFiles {

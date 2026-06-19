@@ -19,6 +19,7 @@ import com.google.android.play.core.appupdate.AppUpdateOptions;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
 
+@SuppressWarnings("deprecation")
 public class OTAUpdateHelper {
 
   private static final int RC_APP_UPDATE = 9001;
