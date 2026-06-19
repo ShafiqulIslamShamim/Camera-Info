@@ -102,77 +102,94 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="8dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
             >
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_search"
-                    android:tint="?attr/colorOnSurfaceVariant"
-                    android:contentDescription="Search Icon"
-                />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="8dp"
+                >
 
-                <EditText
-                    android:id="@+id/search_input"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@null"
-                    android:hint="Search info..."
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textColorHint="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_search"
+                        android:tint="?attr/colorOnSurfaceVariant"
+                        android:contentDescription="Search Icon"
+                    />
 
-                <TextView
-                    android:id="@+id/search_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="0/0"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="12sp"
-                />
+                    <EditText
+                        android:id="@+id/search_input"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@null"
+                        android:hint="Search info..."
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textColorHint="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                    />
 
-                <ImageButton
-                    android:id="@+id/search_prev"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_arrow_up"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="?attr/colorOnSurface"
-                    android:contentDescription="Previous match"
-                />
+                    <TextView
+                        android:id="@+id/search_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="0/0"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                    />
 
-                <ImageButton
-                    android:id="@+id/search_next"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_arrow_down"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="?attr/colorOnSurface"
-                    android:contentDescription="Next match"
-                />
+                    <ImageButton
+                        android:id="@+id/search_prev"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_arrow_up"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="?attr/colorOnSurface"
+                        android:contentDescription="Previous match"
+                    />
 
-                <ImageButton
-                    android:id="@+id/search_close"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_close"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="?attr/colorOnSurface"
-                    android:contentDescription="Close search"
+                    <ImageButton
+                        android:id="@+id/search_next"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_arrow_down"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="?attr/colorOnSurface"
+                        android:contentDescription="Next match"
+                    />
+
+                    <ImageButton
+                        android:id="@+id/search_close"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_close"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:tint="?attr/colorOnSurface"
+                        android:contentDescription="Close search"
+                    />
+
+                </LinearLayout>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/search_progress_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:visibility="gone"
+                    android:indeterminate="true"
+                    app:trackCornerRadius="2dp"
                 />
 
             </LinearLayout>

@@ -29,6 +29,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.shamim.camerainfo.R;
 import com.shamim.camerainfo.c2api_key.*;
 import com.shamim.camerainfo.exception_catcher.*;
@@ -60,6 +61,7 @@ public class MainActivity extends BaseActivity {
   private ImageButton searchPrev;
   private ImageButton searchNext;
   private ImageButton searchClose;
+  private LinearProgressIndicator searchProgressIndicator;
 
   private SpannableStringBuilder cachedSpannableText = null;
   private String cachedPlainText = "";
@@ -187,6 +189,7 @@ public class MainActivity extends BaseActivity {
     searchPrev = findViewById(R.id.search_prev);
     searchNext = findViewById(R.id.search_next);
     searchClose = findViewById(R.id.search_close);
+    searchProgressIndicator = findViewById(R.id.search_progress_indicator);
 
     searchInput.addTextChangedListener(new android.text.TextWatcher() {
       @Override
@@ -199,11 +202,14 @@ public class MainActivity extends BaseActivity {
       public void afterTextChanged(android.text.Editable s) {
         currentSearchQuery = s.toString();
         currentMatchIndex = 0;
+        if (searchProgressIndicator != null) {
+          searchProgressIndicator.setVisibility(View.VISIBLE);
+        }
         if (searchRunnable != null) {
           searchHandler.removeCallbacks(searchRunnable);
         }
         searchRunnable = () -> updateSearchHighlights(true);
-        searchHandler.postDelayed(searchRunnable, 150);
+        searchHandler.postDelayed(searchRunnable, 250);
       }
     });
 
@@ -365,6 +371,9 @@ public class MainActivity extends BaseActivity {
     currentSearchQuery = "";
     searchInput.setText("");
     searchBar.setVisibility(View.GONE);
+    if (searchProgressIndicator != null) {
+      searchProgressIndicator.setVisibility(View.GONE);
+    }
     android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     if (imm != null) {
       imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
@@ -377,9 +386,8 @@ public class MainActivity extends BaseActivity {
   }
 
   private void updateSearchHighlights(boolean forceRequery) {
-    if (progressIndicator != null) {
-      progressIndicator.setIndeterminate(true);
-      progressIndicator.setVisibility(View.VISIBLE);
+    if (searchProgressIndicator != null) {
+      searchProgressIndicator.setVisibility(View.VISIBLE);
     }
 
     if (currentSearchFuture != null) {
@@ -395,8 +403,8 @@ public class MainActivity extends BaseActivity {
       matchOffsets.clear();
       currentMatchIndex = -1;
       searchCount.setText("0/0");
-      if (progressIndicator != null) {
-        progressIndicator.setVisibility(View.GONE);
+      if (searchProgressIndicator != null) {
+        searchProgressIndicator.setVisibility(View.GONE);
       }
       textView.setText(cachedSpannableText != null ? cachedSpannableText : "");
       return;
@@ -414,6 +422,9 @@ public class MainActivity extends BaseActivity {
 
     // Fast-path: If query hasn't changed, we don't need to re-find matches!
     boolean needRequery = forceRequery || !query.equals(lastSearchQuery) || matchOffsets.isEmpty();
+
+    // Fetch text metrics parameters on the main thread
+    final PrecomputedTextCompat.Params params = TextViewCompat.getTextMetricsParams(textView);
 
     currentSearchFuture = searchExecutor.submit(() -> {
       if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
@@ -472,6 +483,11 @@ public class MainActivity extends BaseActivity {
 
       if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
 
+      // Precompute layout off the main thread
+      final PrecomputedTextCompat precomputedText = PrecomputedTextCompat.create(spannable, params);
+
+      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+
       searchHandler.post(() -> {
         if (generation != searchGeneration) return;
 
@@ -480,7 +496,8 @@ public class MainActivity extends BaseActivity {
         currentMatchIndex = finalMatchIndex;
         lastSearchQuery = query;
 
-        textView.setText(spannable);
+        // Apply precomputed text layout instantly to prevent main-thread block
+        TextViewCompat.setPrecomputedText(textView, precomputedText);
 
         if (matchCount > 0) {
           searchCount.setText((currentMatchIndex + 1) + "/" + matchCount);
@@ -489,8 +506,8 @@ public class MainActivity extends BaseActivity {
           searchCount.setText("0/0");
         }
 
-        if (progressIndicator != null) {
-          progressIndicator.setVisibility(View.GONE);
+        if (searchProgressIndicator != null) {
+          searchProgressIndicator.setVisibility(View.GONE);
         }
       });
     });
