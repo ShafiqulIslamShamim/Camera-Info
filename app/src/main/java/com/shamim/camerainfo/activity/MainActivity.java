@@ -65,6 +65,7 @@ public class MainActivity extends BaseActivity {
 
   private SpannableStringBuilder cachedSpannableText = null;
   private String cachedPlainText = "";
+  private String cachedLowerPlainText = "";
   private String lastSearchQuery = "";
   private final java.util.concurrent.ExecutorService searchExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
   private java.util.concurrent.Future<?> currentSearchFuture = null;
@@ -202,19 +203,27 @@ public class MainActivity extends BaseActivity {
       public void afterTextChanged(android.text.Editable s) {
         currentSearchQuery = s.toString();
         currentMatchIndex = 0;
-        if (searchProgressIndicator != null) {
-          searchProgressIndicator.setVisibility(View.VISIBLE);
-        }
         if (searchRunnable != null) {
           searchHandler.removeCallbacks(searchRunnable);
         }
-        searchRunnable = () -> updateSearchHighlights(true);
-        searchHandler.postDelayed(searchRunnable, 250);
+        if (currentSearchQuery.isEmpty()) {
+          if (searchProgressIndicator != null) {
+            searchProgressIndicator.setVisibility(View.GONE);
+          }
+          updateSearchHighlights(true);
+        } else {
+          searchRunnable = () -> updateSearchHighlights(true);
+          searchHandler.postDelayed(searchRunnable, 1500);
+        }
       }
     });
 
     searchInput.setOnEditorActionListener((v, actionId, event) -> {
       if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+        if (searchRunnable != null) {
+          searchHandler.removeCallbacks(searchRunnable);
+        }
+        updateSearchHighlights(true);
         android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
           imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
@@ -285,6 +294,7 @@ public class MainActivity extends BaseActivity {
   public void setInfoToTextView() {
     cachedSpannableText = null;
     cachedPlainText = "";
+    cachedLowerPlainText = "";
     lastSearchQuery = "";
     // 1. Show the indicator immediately
     if (progressIndicator != null) {
@@ -313,6 +323,9 @@ public class MainActivity extends BaseActivity {
 
           progressIndicator.setProgress(30, true);
 
+          String plainText = combinedInfo.toString();
+          String lowerPlainText = plainText.toLowerCase(java.util.Locale.US);
+
           int keyColor = getColorFromAttr(this, androidx.appcompat.R.attr.colorPrimary);
           int separatorColor =
               getColorFromAttr(this, com.google.android.material.R.attr.colorTertiary);
@@ -321,9 +334,9 @@ public class MainActivity extends BaseActivity {
 
           SpannableStringBuilder spannableText =
               ColoredTextHelper.setColoredText(
-                  combinedInfo.toString(), keyColor, separatorColor, valueColor);
+                  plainText, keyColor, separatorColor, valueColor);
 
-          progressIndicator.setProgress(50, true);
+          progressIndicator.setProgress(45, true);
 
           // 3. Prepare text layout off the main thread (async + safe)
           PrecomputedTextCompat.Params params = TextViewCompat.getTextMetricsParams(textView);
@@ -340,7 +353,8 @@ public class MainActivity extends BaseActivity {
                 TextViewCompat.setPrecomputedText(textView, precomputedText);
 
                 cachedSpannableText = spannableText;
-                cachedPlainText = combinedInfo.toString();
+                cachedPlainText = plainText;
+                cachedLowerPlainText = lowerPlainText;
 
                 if (!currentSearchQuery.isEmpty()) {
                   updateSearchHighlights(true);
@@ -415,6 +429,9 @@ public class MainActivity extends BaseActivity {
       CharSequence text = textView.getText();
       cachedSpannableText = new SpannableStringBuilder(text != null ? text : "");
       cachedPlainText = cachedSpannableText.toString();
+      cachedLowerPlainText = cachedPlainText.toLowerCase(java.util.Locale.US);
+    } else if (cachedLowerPlainText == null || cachedLowerPlainText.isEmpty()) {
+      cachedLowerPlainText = cachedPlainText.toLowerCase(java.util.Locale.US);
     }
 
     final String searchTargetText = cachedPlainText;
@@ -431,8 +448,8 @@ public class MainActivity extends BaseActivity {
 
       final java.util.ArrayList<Integer> localMatches;
       if (needRequery) {
-        final String queryLower = query.toLowerCase();
-        final String textStrLower = searchTargetText.toLowerCase();
+        final String queryLower = query.toLowerCase(java.util.Locale.US);
+        final String textStrLower = cachedLowerPlainText;
         localMatches = new java.util.ArrayList<>();
 
         int index = textStrLower.indexOf(queryLower);
