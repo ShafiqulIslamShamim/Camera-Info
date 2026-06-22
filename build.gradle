@@ -1,11 +1,24 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '8.13.0' apply false
-    id 'com.android.library' version '8.13.0' apply false
-    id 'com.google.gms.google-services' version '4.4.4' apply false
-    id 'com.google.firebase.crashlytics' version '3.0.6' apply false
+	id 'com.android.application' version '8.13.0' apply false
+	id 'com.android.library' version '8.13.0' apply false
+	id 'com.google.gms.google-services' version '4.4.4' apply false
+	id 'com.google.firebase.crashlytics' version '3.0.6' apply false
+	id 'com.diffplug.spotless' version '7.0.2'
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+spotless {
+	java {
+		target '**/*.java'
+		googleJavaFormat()
+	}
+
+	format('xml') {
+		target '**/*.xml'
+		eclipseWtp('xml')
+	}
+
+	groovyGradle {
+		target '*.gradle', '**/*.gradle'
+		greclipse()
+	}
 }

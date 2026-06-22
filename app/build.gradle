@@ -1,13 +1,13 @@
 plugins {
-    id 'com.android.application'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+	id 'com.android.application'
+	id 'com.google.gms.google-services'
+	id 'com.google.firebase.crashlytics'
 }
 
 // Auto-generate dummy google-services.json if it is missing, to keep the build working
 def googleServicesJsonFile = file("google-services.json")
 if (!googleServicesJsonFile.exists()) {
-    googleServicesJsonFile.text = """{
+	googleServicesJsonFile.text = """{
   "project_info": {
     "project_number": "1234567890",
     "project_id": "dummy-project",
@@ -36,124 +36,121 @@ if (!googleServicesJsonFile.exists()) {
   ],
   "configuration_version": "1"
 }"""
-    println "Generated dummy google-services.json to satisfy Google Services plugin"
+	println "Generated dummy google-services.json to satisfy Google Services plugin"
 }
 
 def keystorePropertiesFile = file("keystore/Signature.properties")
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+	keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
 
 
 android {
-    namespace 'com.shamim.camerainfo'
-    compileSdk 36
-    
-    
-    defaultConfig {
-        applicationId "com.shamim.camerainfo"
-        minSdk 26
-        targetSdk 36
-        versionCode 16
-        versionName "2.5"
-        
-        vectorDrawables { 
-            useSupportLibrary true
-        }
-        
-    }
+	namespace 'com.shamim.camerainfo'
+	compileSdk 36
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    
-    signingConfigs {
-        release {
-            if (keystoreProperties['STORE_FILE']) {
-    storeFile file(keystoreProperties['STORE_FILE'])
-    storePassword keystoreProperties['STORE_PASSWORD']
-    keyAlias keystoreProperties['KEY_ALIAS']
-    keyPassword keystoreProperties['KEY_PASSWORD']
-}
-        }
-    }
 
-    buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-    }
+	defaultConfig {
+		applicationId "com.shamim.camerainfo"
+		minSdk 26
+		targetSdk 36
+		versionCode 18
+		versionName "2.7"
 
-    
-  /*  buildFeatures {
-        viewBinding true
-        
-    }
-    */
-    
+		vectorDrawables {
+			useSupportLibrary true
+		}
+	}
+
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_17
+		targetCompatibility JavaVersion.VERSION_17
+	}
+
+	signingConfigs {
+		release {
+			if (keystoreProperties['STORE_FILE']) {
+				storeFile file(keystoreProperties['STORE_FILE'])
+				storePassword keystoreProperties['STORE_PASSWORD']
+				keyAlias keystoreProperties['KEY_ALIAS']
+				keyPassword keystoreProperties['KEY_PASSWORD']
+			}
+		}
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled true
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+			signingConfig signingConfigs.release
+		}
+	}
+
+
+	/*  buildFeatures {
+	 viewBinding true
+	 }
+	 */
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs += ["-Xlint:all"]
+	options.compilerArgs += ["-Xlint:all"]
 }
 
 dependencies {
 
-    implementation("com.google.android.play:app-update:2.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.14.0-alpha08")
-    implementation 'androidx.preference:preference:1.2.1'
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation "androidx.activity:activity:1.9.0"
-    implementation 'androidx.documentfile:documentfile:1.1.0'
-    implementation "com.airbnb.android:lottie:6.7.1"
-    // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-    // Add the dependencies for the Crashlytics and Analytics libraries
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation "com.github.mdbqnull:seasonal-effects-android:1.0.0"
-    implementation "com.caverock:androidsvg:1.4"
+	implementation("com.google.android.play:app-update:2.1.0")
+	implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+	implementation("androidx.appcompat:appcompat:1.7.1")
+	implementation("com.google.android.material:material:1.14.0-alpha08")
+	implementation 'androidx.preference:preference:1.2.1'
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+	implementation "androidx.activity:activity:1.9.0"
+	implementation 'androidx.documentfile:documentfile:1.1.0'
+	implementation "com.airbnb.android:lottie:6.7.1"
+	// Import the BoM for the Firebase platform
+	implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+	// Add the dependencies for the Crashlytics and Analytics libraries
+	// When using the BoM, you don't specify versions in Firebase library dependencies
+	implementation("com.google.firebase:firebase-crashlytics")
+	implementation("com.google.firebase:firebase-analytics")
+	implementation "com.github.mdbqnull:seasonal-effects-android:1.0.0"
+	implementation "com.caverock:androidsvg:1.4"
 }
 
 task createSigningAndFirebaseFiles {
-    doLast {
-        def env_google_services_json = System.getenv("GOOGLE_SERVICES_JSON")
-        if (env_google_services_json != null && !env_google_services_json.isEmpty()) {
-            file("google-services.json").text = env_google_services_json
-            println "Successfully created google-services.json"
-        } else {
-            println "GOOGLE_SERVICES_JSON environment variable is null or empty"
-        }
+	doLast {
+		def env_google_services_json = System.getenv("GOOGLE_SERVICES_JSON")
+		if (env_google_services_json != null && !env_google_services_json.isEmpty()) {
+			file("google-services.json").text = env_google_services_json
+			println "Successfully created google-services.json"
+		} else {
+			println "GOOGLE_SERVICES_JSON environment variable is null or empty"
+		}
 
-        def env_keystore_base64 = System.getenv("RELEASE_KEYSTORE_BASE64")
-        def store_password = System.getenv("STORE_PASSWORD")
-        def key_alias = System.getenv("KEY_ALIAS")
-        def key_password = System.getenv("KEY_PASSWORD")
+		def env_keystore_base64 = System.getenv("RELEASE_KEYSTORE_BASE64")
+		def store_password = System.getenv("STORE_PASSWORD")
+		def key_alias = System.getenv("KEY_ALIAS")
+		def key_password = System.getenv("KEY_PASSWORD")
 
-        if (env_keystore_base64 != null && !env_keystore_base64.isEmpty()) {
-            mkdir("keystore")
-            file("keystore/release.jks").bytes = Base64.getDecoder().decode(env_keystore_base64.trim().replaceAll("\\s", ""))
-            println "Successfully created keystore/release.jks"
+		if (env_keystore_base64 != null && !env_keystore_base64.isEmpty()) {
+			mkdir("keystore")
+			file("keystore/release.jks").bytes = Base64.getDecoder().decode(env_keystore_base64.trim().replaceAll("\\s", ""))
+			println "Successfully created keystore/release.jks"
 
-            def signatureProps = ""
-            signatureProps += "STORE_FILE=keystore/release.jks\n"
-            signatureProps += "STORE_PASSWORD=${store_password}\n"
-            signatureProps += "KEY_ALIAS=${key_alias}\n"
-            signatureProps += "KEY_PASSWORD=${key_password}\n"
-            
-            file("keystore/Signature.properties").text = signatureProps
-            println "Successfully created keystore/Signature.properties"
-        } else {
-            println "RELEASE_KEYSTORE_BASE64 environment variable is null or empty"
-        }
-    }
+			def signatureProps = ""
+			signatureProps += "STORE_FILE=keystore/release.jks\n"
+			signatureProps += "STORE_PASSWORD=${store_password}\n"
+			signatureProps += "KEY_ALIAS=${key_alias}\n"
+			signatureProps += "KEY_PASSWORD=${key_password}\n"
+
+			file("keystore/Signature.properties").text = signatureProps
+			println "Successfully created keystore/Signature.properties"
+		} else {
+			println "RELEASE_KEYSTORE_BASE64 environment variable is null or empty"
+		}
+	}
 }
 

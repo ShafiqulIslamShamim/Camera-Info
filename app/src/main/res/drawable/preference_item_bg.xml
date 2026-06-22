@@ -1,11 +1,7 @@
-<shape
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:shape="rectangle"
->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	android:shape="rectangle">
 
-    <solid
-    android:color="?attr/colorSurfaceContainer"
-  /> <!-- light pink-ish background -->
+	<solid android:color="?attr/colorSurfaceContainer" /> <!-- light pink-ish background -->
 
-    <corners android:radius="18dp" />
+	<corners android:radius="18dp" />
 </shape>

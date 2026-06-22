@@ -34,7 +34,7 @@ public class CaptureResultFormatter {
 
   private static String getDescription(String name) {
     switch (name) {
-        // -------------------- COLOR CORRECTION --------------------
+      // -------------------- COLOR CORRECTION --------------------
       case "android.colorCorrection.aberrationMode":
         return "Chromatic aberration correction mode applied";
       case "android.colorCorrection.gains":
@@ -46,7 +46,7 @@ public class CaptureResultFormatter {
       case "android.colorCorrection.colorTemperature":
         return "Color temperature applied in Kelvin";
 
-        // -------------------- CONTROL --------------------
+      // -------------------- CONTROL --------------------
       case "android.control.aeAntibandingMode":
         return "Auto-exposure antibanding mode used";
       case "android.control.aeExposureCompensation":
@@ -100,15 +100,15 @@ public class CaptureResultFormatter {
       case "android.control.zoomRatio":
         return "Zoom ratio applied";
 
-        // -------------------- DISTORTION CORRECTION --------------------
+      // -------------------- DISTORTION CORRECTION --------------------
       case "android.distortionCorrection.mode":
         return "Distortion correction mode applied";
 
-        // -------------------- EDGE --------------------
+      // -------------------- EDGE --------------------
       case "android.edge.mode":
         return "Edge enhancement mode applied";
 
-        // -------------------- FLASH --------------------
+      // -------------------- FLASH --------------------
       case "android.flash.firingPower":
         return "Flash firing power level used";
       case "android.flash.firingTime":
@@ -122,11 +122,11 @@ public class CaptureResultFormatter {
       case "android.flash.torchStrength":
         return "Torch strength level used";
 
-        // -------------------- HOT PIXEL --------------------
+      // -------------------- HOT PIXEL --------------------
       case "android.hotPixel.mode":
         return "Hot pixel correction mode applied";
 
-        // -------------------- JPEG --------------------
+      // -------------------- JPEG --------------------
       case "android.jpeg.gpsCoordinates":
         return "GPS coordinates in JPEG EXIF";
       case "android.jpeg.gpsProcessingMethod":
@@ -142,7 +142,7 @@ public class CaptureResultFormatter {
       case "android.jpeg.thumbnailSize":
         return "JPEG thumbnail size applied";
 
-        // -------------------- LENS --------------------
+      // -------------------- LENS --------------------
       case "android.lens.aperture":
         return "Lens aperture used (f-number)";
       case "android.lens.filterDensity":
@@ -158,11 +158,11 @@ public class CaptureResultFormatter {
       case "android.lens.state":
         return "Current state of the lens system";
 
-        // -------------------- NOISE REDUCTION --------------------
+      // -------------------- NOISE REDUCTION --------------------
       case "android.noiseReduction.mode":
         return "Noise reduction mode applied";
 
-        // -------------------- SENSOR --------------------
+      // -------------------- SENSOR --------------------
       case "android.sensor.dynamicBlackLevel":
         return "Dynamic black level values applied";
       case "android.sensor.exposureTime":
@@ -186,11 +186,11 @@ public class CaptureResultFormatter {
       case "android.sensor.timestamp":
         return "Timestamp of the frame in nanoseconds";
 
-        // -------------------- SHADING --------------------
+      // -------------------- SHADING --------------------
       case "android.shading.mode":
         return "Lens shading correction mode applied";
 
-        // -------------------- STATISTICS --------------------
+      // -------------------- STATISTICS --------------------
       case "android.statistics.faceDetectMode":
         return "Face detection mode applied";
       case "android.statistics.faces":
@@ -212,7 +212,7 @@ public class CaptureResultFormatter {
       case "android.statistics.sceneFlicker":
         return "Detected scene flicker frequency";
 
-        // -------------------- TONEMAP --------------------
+      // -------------------- TONEMAP --------------------
       case "android.tonemap.curveBlue":
         return "Tonemap curve applied for blue channel";
       case "android.tonemap.curveGreen":
@@ -222,7 +222,7 @@ public class CaptureResultFormatter {
       case "android.tonemap.mode":
         return "Tonemap processing mode applied";
 
-        // -------------------- Unknown RESULT KEYS --------------------
+      // -------------------- Unknown RESULT KEYS --------------------
       case "android.blackLevel.lock":
         return "Reports whether the black level offset was locked during the capture";
       case "android.control.enableZsl":
@@ -252,13 +252,13 @@ public class CaptureResultFormatter {
 
   private static String getAvailableValues(String name) {
     switch (name) {
-        // -------------------- COLOR CORRECTION --------------------
+      // -------------------- COLOR CORRECTION --------------------
       case "android.colorCorrection.aberrationMode":
         return mapArrayValues(Map.of(0, "OFF", 1, "FAST", 2, "HIGH_QUALITY"));
       case "android.colorCorrection.mode":
         return mapArrayValues(Map.of(0, "TRANSFORM_MATRIX", 1, "FAST", 2, "HIGH_QUALITY"));
 
-        // -------------------- CONTROL --------------------
+      // -------------------- CONTROL --------------------
       case "android.control.aeAntibandingMode":
         return mapArrayValues(Map.of(0, "OFF", 1, "50HZ", 2, "60HZ", 3, "AUTO"));
       case "android.control.aeMode":
@@ -405,43 +405,43 @@ public class CaptureResultFormatter {
       case "android.control.videoStabilizationMode":
         return mapArrayValues(Map.of(0, "OFF", 1, "ON", 2, "PREVIEW_STABILIZATION"));
 
-        // -------------------- DISTORTION CORRECTION --------------------
+      // -------------------- DISTORTION CORRECTION --------------------
       case "android.distortionCorrection.mode":
         return mapArrayValues(Map.of(0, "NO", 1, "GEOMETRIC", 2, "GEOMETRIC_AND_CHROMATIC"));
 
-        // -------------------- EDGE --------------------
+      // -------------------- EDGE --------------------
       case "android.edge.mode":
         return mapArrayValues(
             Map.of(0, "OFF", 1, "FAST", 2, "HIGH_QUALITY", 3, "ZERO_SHUTTER_LAG"));
 
-        // -------------------- FLASH --------------------
+      // -------------------- FLASH --------------------
       case "android.flash.mode":
         return mapArrayValues(Map.of(0, "OFF", 1, "SINGLE", 2, "TORCH"));
       case "android.flash.state":
         return mapArrayValues(
             Map.of(0, "UNAVAILABLE", 1, "CHARGING", 2, "READY", 3, "FIRED", 4, "PARTIAL"));
 
-        // -------------------- HOT PIXEL --------------------
+      // -------------------- HOT PIXEL --------------------
       case "android.hotPixel.mode":
         return mapArrayValues(Map.of(0, "OFF", 1, "FAST", 2, "HIGH_QUALITY"));
 
-        // -------------------- JPEG --------------------
+      // -------------------- JPEG --------------------
       case "android.jpeg.orientation":
         return mapArrayValues(
             Map.of(0, "0_DEGREES", 90, "90_DEGREES", 180, "180_DEGREES", 270, "270_DEGREES"));
 
-        // -------------------- LENS --------------------
+      // -------------------- LENS --------------------
       case "android.lens.opticalStabilizationMode":
         return mapArrayValues(Map.of(0, "OFF", 1, "ON"));
       case "android.lens.state":
         return mapArrayValues(Map.of(0, "STATIONARY", 1, "MOVING"));
 
-        // -------------------- NOISE REDUCTION --------------------
+      // -------------------- NOISE REDUCTION --------------------
       case "android.noiseReduction.mode":
         return mapArrayValues(
             Map.of(0, "OFF", 1, "FAST", 2, "HIGH_QUALITY", 3, "MINIMAL", 4, "ZERO_SHUTTER_LAG"));
 
-        // -------------------- SENSOR --------------------
+      // -------------------- SENSOR --------------------
       case "android.sensor.testPatternMode":
         return mapArrayValues(
             Map.of(
@@ -458,11 +458,11 @@ public class CaptureResultFormatter {
                 5,
                 "CUSTOM1"));
 
-        // -------------------- SHADING --------------------
+      // -------------------- SHADING --------------------
       case "android.shading.mode":
         return mapArrayValues(Map.of(0, "OFF", 1, "FAST", 2, "HIGH_QUALITY"));
 
-        // -------------------- STATISTICS --------------------
+      // -------------------- STATISTICS --------------------
       case "android.statistics.faceDetectMode":
         return mapArrayValues(Map.of(0, "OFF", 1, "SIMPLE", 2, "FULL"));
       case "android.statistics.hotPixelMapMode":
@@ -472,7 +472,7 @@ public class CaptureResultFormatter {
       case "android.statistics.sceneFlicker":
         return mapArrayValues(Map.of(0, "NONE", 1, "50HZ", 2, "60HZ"));
 
-        // -------------------- TONEMAP --------------------
+      // -------------------- TONEMAP --------------------
       case "android.tonemap.mode":
         return mapArrayValues(Map.of(0, "CONTRAST_CURVE", 1, "FAST", 2, "HIGH_QUALITY"));
 

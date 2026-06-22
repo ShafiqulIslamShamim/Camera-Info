@@ -7,16 +7,15 @@ import android.hardware.camera2.*;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.*;
+import android.text.style.BackgroundColorSpan;
 import android.util.*;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.text.style.BackgroundColorSpan;
+import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.FileProvider;
@@ -70,14 +69,18 @@ public class MainActivity extends BaseActivity {
   private String lastSearchQuery = "";
   private final java.util.concurrent.ThreadPoolExecutor searchExecutor =
       new java.util.concurrent.ThreadPoolExecutor(
-          2, 8, 5L, java.util.concurrent.TimeUnit.SECONDS,
+          2,
+          8,
+          5L,
+          java.util.concurrent.TimeUnit.SECONDS,
           new java.util.concurrent.LinkedBlockingQueue<Runnable>());
   private java.util.concurrent.Future<?> currentSearchFuture = null;
   private int searchGeneration = 0;
   private final java.util.ArrayList<Integer> matchOffsets = new java.util.ArrayList<>();
   private int currentMatchIndex = -1;
   private String currentSearchQuery = "";
-  private final android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+  private final android.os.Handler searchHandler =
+      new android.os.Handler(android.os.Looper.getMainLooper());
   private Runnable searchRunnable;
 
   @Override
@@ -190,97 +193,108 @@ public class MainActivity extends BaseActivity {
     // Initialize Search UI Components
     searchBar = findViewById(R.id.search_bar);
     searchInput = findViewById(R.id.search_input);
-    searchInput.setFilters(new android.text.InputFilter[] {
-      new android.text.InputFilter() {
-        @Override
-        public java.lang.CharSequence filter(
-            java.lang.CharSequence source, int start, int end,
-            android.text.Spanned dest, int dstart, int dend) {
-          if (source == null) return null;
-          boolean hasLinebreakerOrTab = false;
-          for (int i = start; i < end; i++) {
-            char c = source.charAt(i);
-            if (c == '\n' || c == '\r' || c == '\t') {
-              hasLinebreakerOrTab = true;
-              break;
-            }
-          }
-          if (hasLinebreakerOrTab) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = start; i < end; i++) {
-              char c = source.charAt(i);
-              if (c == '\n' || c == '\r' || c == '\t') {
-                sb.append(' ');
-              } else {
-                sb.append(c);
+    searchInput.setFilters(
+        new android.text.InputFilter[] {
+          new android.text.InputFilter() {
+            @Override
+            public java.lang.CharSequence filter(
+                java.lang.CharSequence source,
+                int start,
+                int end,
+                android.text.Spanned dest,
+                int dstart,
+                int dend) {
+              if (source == null) return null;
+              boolean hasLinebreakerOrTab = false;
+              for (int i = start; i < end; i++) {
+                char c = source.charAt(i);
+                if (c == '\n' || c == '\r' || c == '\t') {
+                  hasLinebreakerOrTab = true;
+                  break;
+                }
               }
+              if (hasLinebreakerOrTab) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = start; i < end; i++) {
+                  char c = source.charAt(i);
+                  if (c == '\n' || c == '\r' || c == '\t') {
+                    sb.append(' ');
+                  } else {
+                    sb.append(c);
+                  }
+                }
+                return sb.toString();
+              }
+              return null;
             }
-            return sb.toString();
           }
-          return null;
-        }
-      }
-    });
+        });
     searchCount = findViewById(R.id.search_count);
     searchPrev = findViewById(R.id.search_prev);
     searchNext = findViewById(R.id.search_next);
     searchClose = findViewById(R.id.search_close);
     searchProgressIndicator = findViewById(R.id.search_progress_indicator);
 
-    searchInput.addTextChangedListener(new android.text.TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+    searchInput.addTextChangedListener(
+        new android.text.TextWatcher() {
+          @Override
+          public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {}
+          @Override
+          public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
-      @Override
-      public void afterTextChanged(android.text.Editable s) {
-        currentSearchQuery = s.toString();
-        currentMatchIndex = 0;
-        if (searchRunnable != null) {
-          searchHandler.removeCallbacks(searchRunnable);
-        }
-        if (currentSearchQuery.isEmpty()) {
-          if (searchProgressIndicator != null) {
-            searchProgressIndicator.setVisibility(View.GONE);
+          @Override
+          public void afterTextChanged(android.text.Editable s) {
+            currentSearchQuery = s.toString();
+            currentMatchIndex = 0;
+            if (searchRunnable != null) {
+              searchHandler.removeCallbacks(searchRunnable);
+            }
+            if (currentSearchQuery.isEmpty()) {
+              if (searchProgressIndicator != null) {
+                searchProgressIndicator.setVisibility(View.GONE);
+              }
+              updateSearchHighlights(true);
+            } else {
+              searchRunnable = () -> updateSearchHighlights(true);
+              searchHandler.postDelayed(searchRunnable, 1100);
+            }
           }
-          updateSearchHighlights(true);
-        } else {
-          searchRunnable = () -> updateSearchHighlights(true);
-          searchHandler.postDelayed(searchRunnable, 1100);
-        }
-      }
-    });
+        });
 
-    searchInput.setOnEditorActionListener((v, actionId, event) -> {
-      if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-        if (searchRunnable != null) {
-          searchHandler.removeCallbacks(searchRunnable);
-        }
-        updateSearchHighlights(true);
-        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-          imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
-        }
-        return true;
-      }
-      return false;
-    });
+    searchInput.setOnEditorActionListener(
+        (v, actionId, event) -> {
+          if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+            if (searchRunnable != null) {
+              searchHandler.removeCallbacks(searchRunnable);
+            }
+            updateSearchHighlights(true);
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+              imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
+            }
+            return true;
+          }
+          return false;
+        });
 
-    searchPrev.setOnClickListener(v -> {
-      if (!matchOffsets.isEmpty()) {
-        currentMatchIndex = (currentMatchIndex - 1 + matchOffsets.size()) % matchOffsets.size();
-        updateSearchHighlights(false);
-      }
-    });
+    searchPrev.setOnClickListener(
+        v -> {
+          if (!matchOffsets.isEmpty()) {
+            currentMatchIndex = (currentMatchIndex - 1 + matchOffsets.size()) % matchOffsets.size();
+            updateSearchHighlights(false);
+          }
+        });
 
-    searchNext.setOnClickListener(v -> {
-      if (!matchOffsets.isEmpty()) {
-        currentMatchIndex = (currentMatchIndex + 1) % matchOffsets.size();
-        updateSearchHighlights(false);
-      }
-    });
+    searchNext.setOnClickListener(
+        v -> {
+          if (!matchOffsets.isEmpty()) {
+            currentMatchIndex = (currentMatchIndex + 1) % matchOffsets.size();
+            updateSearchHighlights(false);
+          }
+        });
 
     searchClose.setOnClickListener(v -> closeSearch());
 
@@ -369,8 +383,7 @@ public class MainActivity extends BaseActivity {
               getColorFromAttr(this, com.google.android.material.R.attr.colorSecondary);
 
           SpannableStringBuilder spannableText =
-              ColoredTextHelper.setColoredText(
-                  plainText, keyColor, separatorColor, valueColor);
+              ColoredTextHelper.setColoredText(plainText, keyColor, separatorColor, valueColor);
 
           progressIndicator.setProgress(45, true);
 
@@ -408,14 +421,19 @@ public class MainActivity extends BaseActivity {
   private void openSearch() {
     searchBar.setVisibility(View.VISIBLE);
     searchInput.requestFocus();
-    searchInput.postDelayed(() -> {
-      if (!isDestroyed() && !isFinishing()) {
-        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-          imm.showSoftInput(searchInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-        }
-      }
-    }, 100);
+    searchInput.postDelayed(
+        () -> {
+          if (!isDestroyed() && !isFinishing()) {
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+              imm.showSoftInput(
+                  searchInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+            }
+          }
+        },
+        100);
   }
 
   private void closeSearch() {
@@ -425,7 +443,9 @@ public class MainActivity extends BaseActivity {
     if (searchProgressIndicator != null) {
       searchProgressIndicator.setVisibility(View.GONE);
     }
-    android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    android.view.inputmethod.InputMethodManager imm =
+        (android.view.inputmethod.InputMethodManager)
+            getSystemService(Context.INPUT_METHOD_SERVICE);
     if (imm != null) {
       imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
     }
@@ -489,108 +509,115 @@ public class MainActivity extends BaseActivity {
     // Fetch text metrics parameters on the main thread
     final PrecomputedTextCompat.Params params = TextViewCompat.getTextMetricsParams(textView);
 
-    currentSearchFuture = searchExecutor.submit(() -> {
-      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+    currentSearchFuture =
+        searchExecutor.submit(
+            () -> {
+              if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
 
-      final java.util.ArrayList<Integer> localMatches;
-      if (needRequery) {
-        final String queryLower = query.toLowerCase(java.util.Locale.US);
-        final String textStrLower = cachedLowerPlainText;
-        localMatches = new java.util.ArrayList<>();
+              final java.util.ArrayList<Integer> localMatches;
+              if (needRequery) {
+                final String queryLower = query.toLowerCase(java.util.Locale.US);
+                final String textStrLower = cachedLowerPlainText;
+                localMatches = new java.util.ArrayList<>();
 
-        int index = textStrLower.indexOf(queryLower);
-        while (index >= 0) {
-          if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
-          localMatches.add(index);
-          if (localMatches.size() >= 1000) {
-            break;
-          }
-          index = textStrLower.indexOf(queryLower, index + 1);
-        }
-      } else {
-        // Reuse precalculated matches
-        localMatches = new java.util.ArrayList<>(matchOffsets);
-      }
+                int index = textStrLower.indexOf(queryLower);
+                while (index >= 0) {
+                  if (generation != searchGeneration || Thread.currentThread().isInterrupted())
+                    return;
+                  localMatches.add(index);
+                  if (localMatches.size() >= 1000) {
+                    break;
+                  }
+                  index = textStrLower.indexOf(queryLower, index + 1);
+                }
+              } else {
+                // Reuse precalculated matches
+                localMatches = new java.util.ArrayList<>(matchOffsets);
+              }
 
-      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+              if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
 
-      final SpannableStringBuilder spannable = new SpannableStringBuilder(baseSpannable);
-      final int matchCount = localMatches.size();
-      final int finalMatchIndex;
-      if (matchCount > 0) {
-        if (targetIndex < 0 || targetIndex >= matchCount) {
-          finalMatchIndex = 0;
-        } else {
-          finalMatchIndex = targetIndex;
-        }
+              final SpannableStringBuilder spannable = new SpannableStringBuilder(baseSpannable);
+              final int matchCount = localMatches.size();
+              final int finalMatchIndex;
+              if (matchCount > 0) {
+                if (targetIndex < 0 || targetIndex >= matchCount) {
+                  finalMatchIndex = 0;
+                } else {
+                  finalMatchIndex = targetIndex;
+                }
 
-        int highlightColor = 0x66FFEB3B; // Yellow with 40% opacity
-        int currentHighlightColor = 0xFFFF9800; // Orange or bright yellow for current match
-        
-        int windowSize = 50;
-        int startHighlight = Math.max(0, finalMatchIndex - windowSize);
-        int endHighlight = Math.min(matchCount - 1, finalMatchIndex + windowSize);
-        
-        for (int i = startHighlight; i <= endHighlight; i++) {
-          if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
-          int start = localMatches.get(i);
-          int end = start + query.length();
-          int color = (i == finalMatchIndex) ? currentHighlightColor : highlightColor;
-          
-          spannable.setSpan(
-              new BackgroundColorSpan(color),
-              start,
-              end,
-              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-      } else {
-        finalMatchIndex = -1;
-      }
+                int highlightColor = 0x66FFEB3B; // Yellow with 40% opacity
+                int currentHighlightColor = 0xFFFF9800; // Orange or bright yellow for current match
 
-      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+                int windowSize = 50;
+                int startHighlight = Math.max(0, finalMatchIndex - windowSize);
+                int endHighlight = Math.min(matchCount - 1, finalMatchIndex + windowSize);
 
-      // Precompute layout off the main thread
-      final PrecomputedTextCompat precomputedText = PrecomputedTextCompat.create(spannable, params);
+                for (int i = startHighlight; i <= endHighlight; i++) {
+                  if (generation != searchGeneration || Thread.currentThread().isInterrupted())
+                    return;
+                  int start = localMatches.get(i);
+                  int end = start + query.length();
+                  int color = (i == finalMatchIndex) ? currentHighlightColor : highlightColor;
 
-      if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
+                  spannable.setSpan(
+                      new BackgroundColorSpan(color),
+                      start,
+                      end,
+                      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+              } else {
+                finalMatchIndex = -1;
+              }
 
-      searchHandler.post(() -> {
-        if (generation != searchGeneration) return;
+              if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
 
-        matchOffsets.clear();
-        matchOffsets.addAll(localMatches);
-        currentMatchIndex = finalMatchIndex;
-        lastSearchQuery = query;
+              // Precompute layout off the main thread
+              final PrecomputedTextCompat precomputedText =
+                  PrecomputedTextCompat.create(spannable, params);
 
-        // Apply precomputed text layout instantly to prevent main-thread block
-        TextViewCompat.setPrecomputedText(textView, precomputedText);
+              if (generation != searchGeneration || Thread.currentThread().isInterrupted()) return;
 
-        if (matchCount > 0) {
-          searchCount.setText((currentMatchIndex + 1) + "/" + matchCount);
-          scrollToOffset(matchOffsets.get(currentMatchIndex));
-        } else {
-          searchCount.setText("0/0");
-        }
+              searchHandler.post(
+                  () -> {
+                    if (generation != searchGeneration) return;
 
-        if (searchProgressIndicator != null) {
-          searchProgressIndicator.setVisibility(View.GONE);
-        }
-      });
-    });
+                    matchOffsets.clear();
+                    matchOffsets.addAll(localMatches);
+                    currentMatchIndex = finalMatchIndex;
+                    lastSearchQuery = query;
+
+                    // Apply precomputed text layout instantly to prevent main-thread block
+                    TextViewCompat.setPrecomputedText(textView, precomputedText);
+
+                    if (matchCount > 0) {
+                      searchCount.setText((currentMatchIndex + 1) + "/" + matchCount);
+                      scrollToOffset(matchOffsets.get(currentMatchIndex));
+                    } else {
+                      searchCount.setText("0/0");
+                    }
+
+                    if (searchProgressIndicator != null) {
+                      searchProgressIndicator.setVisibility(View.GONE);
+                    }
+                  });
+            });
   }
 
   private void scrollToOffset(int offset) {
-    textView.post(() -> {
-      android.text.Layout layout = textView.getLayout();
-      if (layout != null) {
-        int line = layout.getLineForOffset(offset);
-        int lineTop = layout.getLineTop(line);
-        androidx.core.widget.NestedScrollView scrollView = findViewById(R.id.scrollView);
-        if (scrollView != null) {
-          scrollView.smoothScrollTo(0, lineTop);
-        }
-      }
-    });
+    textView.post(
+        () -> {
+          android.text.Layout layout = textView.getLayout();
+          if (layout != null) {
+            int line = layout.getLineForOffset(offset);
+            int lineTop = layout.getLineTop(line);
+            androidx.core.widget.NestedScrollView scrollView = findViewById(R.id.scrollView);
+            if (scrollView != null) {
+              scrollView.smoothScrollTo(0, lineTop);
+            }
+          }
+        });
   }
 
   // === Menu Code (Unchanged) ===

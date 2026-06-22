@@ -214,13 +214,6 @@ public class SettingsActivity extends BaseActivity {
 
       if (key.equals("disable_seasonal_effect")) {
         restartAppDelayed(requireContext());
-
-      }
-
-      // শুধু theme_preference হলে
-      else if (key.equals("theme_preference") || key.equals("app_theme_preference")) {
-
-        requireActivity().recreate();
       }
     }
 

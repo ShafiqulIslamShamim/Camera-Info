@@ -1,11 +1,48 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-    <string name="app_name">Camera Info</string>
-        <string name="settings">Settings</string>
-   <string name="shortcut_main_short">Home</string>
-<string name="shortcut_main_long">Open Main Screen</string>
-<string name="shortcut_settings_short">Settings</string>
-<string name="shortcut_settings_long">Open Settings</string>
+	<string name="app_name">Camera Info</string>
+	<string name="settings">Settings</string>
+	<string name="shortcut_main_short">Home</string>
+	<string name="shortcut_main_long">Open Main Screen</string>
+	<string name="shortcut_settings_short">Settings</string>
+	<string name="shortcut_settings_long">Open Settings</string>
+
+
+	<!-- Style Screen -->
+	<string name="style_title">Style</string>
+	<string name="style_close">Close</string>
+
+	<!-- Active Badge -->
+	<string name="active_dynamic">Dynamic Active</string>
+	<string name="active_emerald">Emerald Active</string>
+	<string name="active_blossom">Blossom Active</string>
+	<string name="active_ocean">Ocean Active</string>
+	<string name="active_amber">Amber Active</string>
+	<string name="active_coral">Coral Active</string>
+	<string name="active_default">Default Active</string>
+
+	<!-- Categories -->
+	<string name="accents_and_schemes">Accents &amp; Schemes</string>
+	<string name="preferred_theme_mode">Preferred Theme Mode</string>
+
+	<!-- Dynamic Theme Option -->
+	<string name="dynamic_color_theme">Dynamic Color Theme (Default)</string>
+
+	<!-- Accent Names -->
+	<string name="accent_emerald">Emerald</string>
+	<string name="accent_blossom">Blossom</string>
+	<string name="accent_ocean">Ocean</string>
+	<string name="accent_amber">Amber</string>
+	<string name="accent_coral">Coral</string>
+
+	<!-- Theme Mode Buttons -->
+	<string name="theme_system">System</string>
+	<string name="theme_light">Off (Light)</string>
+	<string name="theme_dark">On (Dark)</string>
+
+	<!-- AMOLED Option -->
+	<string name="amoled_black_mode">AMOLED Black Mode</string>
+	<string name="amoled_description">Uses pitch-black background to save battery</string>
 
 
 </resources>

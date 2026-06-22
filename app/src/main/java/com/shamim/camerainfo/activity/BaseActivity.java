@@ -45,10 +45,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     String currentAppThemePref = SharedPrefValues.getValue("app_theme_preference", "0");
     boolean currentAmoled = SharedPrefValues.getValue("amoled_black_mode", false);
 
-    if (lastAppliedThemePref != null && (
-        !lastAppliedThemePref.equals(currentThemePref) ||
-        !lastAppliedAppThemePref.equals(currentAppThemePref) ||
-        lastAppliedAmoled != currentAmoled)) {
+    if (lastAppliedThemePref != null
+        && (!lastAppliedThemePref.equals(currentThemePref)
+            || !lastAppliedAppThemePref.equals(currentAppThemePref)
+            || lastAppliedAmoled != currentAmoled)) {
 
       lastAppliedThemePref = currentThemePref;
       lastAppliedAppThemePref = currentAppThemePref;
@@ -100,7 +100,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     } else if (appThemePref.equals("5")) {
       themeRes = isLight ? R.style.AppThemeCoralLight : R.style.AppThemeCoralDark;
     } else {
-      themeRes = isLight ? R.style.AppThemeDefaultLight : R.style.AppThemeDefaultDark;
+      themeRes = isLight ? R.style.AppThemeLight : R.style.AppThemeDark;
     }
 
     setTheme(themeRes);
