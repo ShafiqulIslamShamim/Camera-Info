@@ -15,6 +15,7 @@
 			android:id="@+id/topAppBar" android:layout_width="match_parent"
 			android:layout_height="41dp" android:title="@string/app_name"
 			android:background="?attr/colorSurface"
+			app:titleTextColor="?attr/colorPrimary"
 			app:layout_scrollFlags="scroll|enterAlways" />
 
 		<HorizontalScrollView
